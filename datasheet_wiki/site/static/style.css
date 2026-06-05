@@ -164,6 +164,26 @@ details.rawtext .bodytext p { color: var(--muted); }
 .result mark { background: rgba(92,200,255,.25); color: inherit; padding: 0 2px; border-radius: 2px; }
 .badge { font-size: 11px; border: 1px solid var(--border); border-radius: 10px; padding: 1px 7px; color: var(--muted); margin-left: 6px; }
 
+/* image lightbox */
+body.lb-open { overflow: hidden; }
+.lightbox { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.88);
+  display: flex; align-items: center; justify-content: center; }
+.lightbox[hidden] { display: none; }
+.lb-stage { margin: 0; max-width: 94vw; max-height: 94vh; display: flex; flex-direction: column;
+  align-items: center; gap: 10px; }
+.lb-stage img { max-width: 94vw; max-height: 86vh; object-fit: contain; background: #fff;
+  border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,.5); cursor: zoom-out; }
+.lb-stage figcaption { color: #cfd6e2; font-size: 13px; text-align: center; }
+.lb-stage figcaption a { color: var(--link); }
+.lb-close, .lb-nav { position: fixed; background: rgba(255,255,255,.08); color: #fff;
+  border: 1px solid rgba(255,255,255,.18); border-radius: 8px; cursor: pointer; line-height: 1;
+  display: flex; align-items: center; justify-content: center; }
+.lb-close { top: 16px; right: 18px; width: 40px; height: 40px; font-size: 26px; }
+.lb-nav { top: 50%; transform: translateY(-50%); width: 46px; height: 64px; font-size: 34px; }
+.lb-prev { left: 16px; }
+.lb-next { right: 16px; }
+.lb-close:hover, .lb-nav:hover { background: rgba(255,255,255,.2); }
+
 @media (max-width: 820px) {
   .topbar #menu-toggle { display: block; }
   .sidebar { position: fixed; left: 0; top: 53px; z-index: 15; transform: translateX(-100%);

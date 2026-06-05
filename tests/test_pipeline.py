@@ -56,6 +56,14 @@ def test_section_layout_and_provenance(wiki: Path):
     assert "Page 4" in html  # captioned page image
 
 
+def test_lightbox_wired(wiki: Path):
+    assert (wiki / "assets" / "lightbox.js").exists()
+    section = (wiki / "sections" / "2-pin-configuration.html").read_text()
+    assert "assets/lightbox.js" in section
+    # no-JS fallback: page-image thumbnails are still real links to the image
+    assert 'class="thumb"' in section and "images/page-0002.png" in section
+
+
 def test_how_page(wiki: Path):
     how = (wiki / "how.html").read_text()
     assert "How this wiki is generated" in how
