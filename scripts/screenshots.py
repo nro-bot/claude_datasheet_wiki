@@ -18,9 +18,15 @@ from weasyprint import HTML, CSS
 SHEET = CSS(string="""
 @page { size: 1180px 4200px; margin: 0; }
 html, body { background: #0f1115; }
-.topbar { position: static; }
-.sidebar { position: static; height: auto; }
-.layout { align-items: stretch; }
+/* WeasyPrint renders print media; re-show the on-screen chrome the site's
+   @media print intentionally hides, so screenshots match the browser. Use a
+   float (not flex) layout — WeasyPrint fragments flex across pages poorly. */
+.topbar { position: static; display: flex !important; }
+.layout { display: block !important; }
+.sidebar { display: block !important; position: static; float: left; width: 300px; height: auto;
+  background: #0f1115 !important; }
+.content { display: block; margin-left: 320px; max-width: none; }
+.section-toc, .pagefoot { display: block !important; }
 /* WeasyPrint can't toggle <details>; show the closed (default) state */
 details.rawtext > .bodytext { display: none; }
 details.codefold > pre { display: none; }
@@ -31,9 +37,9 @@ def _content_height(pix, scale):
     w, h, n = pix.width, pix.height, pix.n
     data = pix.samples
     stride = w * n
-    # scan only the content column (right of the ~300px-wide sidebar) so the
-    # full-height sidebar doesn't make every row look like content
-    cols = list(range(int(w * 0.34) * n, w * n - n, max(n * 12, n)))
+    # scan the full width for the last row with real content (the sidebar shares
+    # the page background, so trailing rows are uniform and trim cleanly)
+    cols = list(range(0, w * n - n, max(n * 12, n)))
     for y in range(h - 1, -1, -4):
         base = y * stride
         lums = [data[base + x] + data[base + x + 1] + data[base + x + 2] for x in cols]

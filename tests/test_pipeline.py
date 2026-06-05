@@ -89,6 +89,16 @@ def test_page_manifest(wiki: Path):
     assert '"n":1' in js
 
 
+def test_personal_notes(wiki: Path):
+    assert (wiki / "assets" / "notes.js").exists()
+    sec = (wiki / "sections" / "3-timer-counter.html").read_text()
+    assert 'id="note" data-section="3-timer-counter"' in sec
+    notes = (wiki / "notes.html").read_text()
+    assert 'id="notes-list"' in notes
+    assert "DSW_SECTIONS=" in (wiki / "assets" / "palette-data.js").read_text()
+    assert "notes.html" in (wiki / "index.html").read_text()
+
+
 def test_command_palette(wiki: Path):
     data = (wiki / "assets" / "palette-data.js").read_text()
     assert data.startswith("window.DSW_PALETTE=")

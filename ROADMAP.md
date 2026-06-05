@@ -33,7 +33,7 @@ Status legend: ✅ done · 🚧 in progress · ⬜ planned
 
 ## Practical / quality-of-life
 - ⬜ **Per-peripheral init-code generator** (LLM tiers).
-- ⬜ **Personal notes / highlights** (localStorage).
+- ✅ **Personal notes / highlights** (localStorage).
 - ⬜ **Electrical-characteristics tables** as sortable/filterable HTML.
 - ⬜ **Single-file / PWA offline export** + print stylesheet.
 

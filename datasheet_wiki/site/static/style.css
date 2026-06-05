@@ -283,3 +283,15 @@ body.pal-open { overflow: hidden; }
 .pal-empty { padding: 18px; color: var(--muted); }
 .pal-hint { padding: 8px 18px; border-top: 1px solid var(--border); font-size: 11px; color: var(--muted); }
 @media (max-width: 600px) { .cmdk-btn { display: none; } }
+
+/* personal notes */
+.notes textarea#note { width: 100%; box-sizing: border-box; min-height: 120px; resize: vertical;
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  padding: 12px; font: inherit; line-height: 1.5; }
+.notes textarea#note:focus { outline: none; border-color: var(--accent); }
+#note-status { font-size: 12px; margin-left: 4px; color: var(--accent2); }
+.note-entry { margin: 18px 0; }
+.note-entry h3 { margin-bottom: 6px; }
+.note-entry pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px; white-space: pre-wrap; }
+@media print { .notes { display: none !important; } }

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}My notes{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>My notes</h1>
+  <p class="lead">Your private notes across this datasheet, gathered from each
+  section. Saved in your browser (per datasheet) — nothing is uploaded.</p>
+  <div id="notes-list"></div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ root }}assets/notes.js"></script>
+{% endblock %}

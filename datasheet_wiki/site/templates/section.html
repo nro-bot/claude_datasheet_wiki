@@ -94,6 +94,12 @@
     </div>
   </details>
 
+  <section class="notes" id="notes">
+    <h2>My notes <span class="from">private · saved in your browser</span> {{ pl('notes', 'My notes') }}</h2>
+    <textarea id="note" data-section="{{ section.id }}" placeholder="Write personal notes about this section…"></textarea>
+    <span id="note-status" class="muted"></span>
+  </section>
+
   <nav class="prevnext">
     {% if prev %}<a class="prev" href="{{ root }}{{ prev.url }}">← {{ prev.title }}</a>{% endif %}
     {% if next %}<a class="next" href="{{ root }}{{ next.url }}">{{ next.title }} →</a>{% endif %}

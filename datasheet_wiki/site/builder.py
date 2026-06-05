@@ -104,8 +104,10 @@ class SiteBuilder:
                            ("Reference builder", "reference.html"), ("Personal Reference", "starred.html"),
                            ("Search", "search.html"), ("How it's generated", "how.html")]:
             palette.append({"t": label, "u": url, "k": "page"})
+        sec_map = {s.id: {"t": (f"{s.number} " if s.number else "") + s.short_title, "u": s.url} for s in sections}
         (self.out / "assets" / "palette-data.js").write_text(
-            "window.DSW_PALETTE=" + json.dumps(palette, ensure_ascii=False, separators=(",", ":")) + ";\n",
+            "window.DSW_PALETTE=" + json.dumps(palette, ensure_ascii=False, separators=(",", ":")) + ";\n"
+            "window.DSW_SECTIONS=" + json.dumps(sec_map, ensure_ascii=False, separators=(",", ":")) + ";\n",
             encoding="utf-8",
         )
 
@@ -180,6 +182,7 @@ class SiteBuilder:
         self._write("reference.html", self.env.get_template("reference.html").render(root="", page="reference", current_url="", **common))
         self._write("starred.html", self.env.get_template("starred.html").render(root="", page="starred", current_url="", **common))
 
+        self._write("notes.html", self.env.get_template("notes.html").render(root="", page="notes", current_url="", **common))
         self._write("how.html", self.env.get_template("how.html").render(root="", page="how", current_url="", **common))
         self._write("about.html", self.env.get_template("about.html").render(root="", page="about", current_url="", **common))
 
