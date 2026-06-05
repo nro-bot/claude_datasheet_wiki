@@ -10,6 +10,7 @@ from typing import Dict, List, Optional
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from ..enrich.base import Enrichment
+from ..glossary import annotate as gloss_annotate, present_terms
 from ..pdf.structure import Section
 from ..utils import Progress, ensure_dir, slugify
 from .render import build_number_index, build_page_index, render_blocks, render_body
@@ -134,6 +135,15 @@ class SiteBuilder:
         )
         self._write("search.html", self.env.get_template("search.html").render(root="", page="search", current_url="", **common))
 
+        # glossary of the embedded acronyms that appear in this datasheet
+        glossary_terms = present_terms(" ".join(s.text for s in sections))
+        self._write(
+            "glossary.html",
+            self.env.get_template("glossary.html").render(
+                root="", page="glossary", current_url="", glossary=glossary_terms, **common,
+            ),
+        )
+
         # code-examples table of contents
         code_groups = []
         for sec in sections:
@@ -197,6 +207,7 @@ class SiteBuilder:
                 breadcrumbs=self._breadcrumbs(sec, by_id),
                 body=body,
                 formatted=formatted,
+                summary_html=gloss_annotate(enr.summary) if enr.summary else "",
                 enrichment=enr,
                 images=sec.page_images,
                 prev=({"title": prev_s.title, "url": prev_s.url} if prev_s else None),

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Glossary{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>Glossary</h1>
+  {% if glossary %}
+  <p class="lead">{{ glossary|length }} common embedded acronym{{ '' if glossary|length == 1 else 's' }}
+    detected in this datasheet. (Acronyms are also explained on hover in section summaries.)</p>
+  <dl class="glossary">
+    {% for term, defn in glossary %}
+    <dt id="g-{{ term }}">{{ term }}</dt>
+    <dd>{{ defn }}</dd>
+    {% endfor %}
+  </dl>
+  {% else %}
+  <p class="muted">No acronyms from the built-in embedded glossary were found in
+  this datasheet.</p>
+  {% endif %}
+</article>
+{% endblock %}

@@ -89,6 +89,16 @@ def test_page_manifest(wiki: Path):
     assert '"n":1' in js
 
 
+def test_glossary_page_and_summary_tooltips(wiki: Path):
+    gloss = (wiki / "glossary.html").read_text()
+    assert "Glossary" in gloss
+    assert "<dt id=\"g-PWM\">PWM</dt>" in gloss  # PWM appears in the sample
+    # acronyms are tooltipped in section summaries
+    timer = (wiki / "sections" / "3-timer-counter.html").read_text()
+    assert '<abbr class="gloss" title="Pulse-Width Modulation">PWM</abbr>' in timer
+    assert "glossary.html" in (wiki / "index.html").read_text()  # nav link
+
+
 def test_personal_notes(wiki: Path):
     assert (wiki / "assets" / "notes.js").exists()
     sec = (wiki / "sections" / "3-timer-counter.html").read_text()

@@ -16,7 +16,7 @@
   {% if enrichment.summary %}
   <div class="summary" id="summary">
     <h2>Summary <span class="from">generated from {{ section.page_label }}</span> {{ pl('summary', 'Summary') }}</h2>
-    <p>{{ enrichment.summary }}</p>
+    <p>{{ summary_html | safe }}</p>
     {% if enrichment.keywords %}
     <p class="tags">{% for k in enrichment.keywords %}<span class="tag">{{ k }}</span>{% endfor %}</p>
     {% endif %}

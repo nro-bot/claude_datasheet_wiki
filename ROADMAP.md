@@ -29,7 +29,7 @@ Status legend: ✅ done · 🚧 in progress · ⬜ planned
 ## Search & navigation
 - ✅ **Ctrl-K command palette** (jump to section/register/pin).
 - ⬜ **Ask-the-datasheet Q&A (RAG)** using the medium/large tier's local embeddings.
-- ⬜ **Acronym/glossary tooltips**.
+- ✅ **Acronym/glossary tooltips**.
 
 ## Practical / quality-of-life
 - ⬜ **Per-peripheral init-code generator** (LLM tiers).

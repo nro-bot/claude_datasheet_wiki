@@ -295,3 +295,10 @@ body.pal-open { overflow: hidden; }
 .note-entry pre { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
   padding: 12px; white-space: pre-wrap; }
 @media print { .notes { display: none !important; } }
+
+/* glossary */
+abbr.gloss { text-decoration: underline dotted; text-underline-offset: 2px; cursor: help;
+  text-decoration-color: var(--muted); }
+dl.glossary { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; margin-top: 16px; }
+dl.glossary dt { font-weight: 700; color: var(--accent2); font-family: "SFMono-Regular", Consolas, monospace; }
+dl.glossary dd { margin: 0; color: var(--text); }
