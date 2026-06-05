@@ -2,8 +2,15 @@
 
 Turn a microcontroller **datasheet PDF** into a **searchable, hyperlinked,
 self-hosted wiki** — with an image of every source page, auto-linked cross
-references ("see Section 4.3", "page 42"), detected registers/bit-fields, and
+references ("see Section 4.3", "page 42"), detected registers/bit-fields,
+**reflowed & formatted text** (headings, bold, bullets, inline figures), and
 optional LLM-generated summaries and code examples.
+
+Each section shows a **Formatted text** view — the raw PDF text reflowed into
+real paragraphs, with table-column fragments (`Bit / 7 / 6 / 5 / 4`) collapsed
+back onto one line, figures cropped and embedded inline, and whole-page tables
+flagged with a link to the page image. The verbatim extracted text is kept too,
+in a collapsed "Raw extracted text" panel.
 
 Built for everything from the 30-page ATtiny85 datasheet to the 600-page RP2040
 datasheet. Parsing can take minutes to hours depending on the tier you pick;

@@ -144,6 +144,29 @@ class PdfDocument:
         prog.close()
         return rels
 
+    def layout_pages(self, figures_dir, limit: int = 0, fig_dpi: int = 110,
+                     extract_figures: bool = True, resume: bool = True):
+        """Structured, web-ready blocks per page (headings, paragraphs, lists,
+        inline figures, whole-page-table notes)."""
+        from .layout import extract_page_blocks
+        from ..utils import Progress
+
+        n = self.page_count if not limit else min(limit, self.page_count)
+        out = []
+        prog = Progress(n, "format text")
+        for i in range(n):
+            try:
+                blocks = extract_page_blocks(
+                    self.doc[i], i, figures_dir=figures_dir, fig_dpi=fig_dpi,
+                    extract_figures=extract_figures, resume=resume,
+                )
+            except Exception:
+                blocks = []
+            out.append(blocks)
+            prog.update()
+        prog.close()
+        return out
+
     def close(self) -> None:
         self.doc.close()
 

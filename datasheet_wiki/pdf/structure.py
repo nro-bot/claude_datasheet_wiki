@@ -13,6 +13,7 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
 from ..utils import slugify
+from .blocks import Block
 from .extract import Link, OutlineItem, PageInfo
 
 
@@ -29,6 +30,7 @@ class Section:
     number: str = ""         # e.g. "4.3" parsed from the title if present
     text: str = ""
     page_images: List[str] = field(default_factory=list)
+    blocks: List[Block] = field(default_factory=list)
 
     @property
     def url(self) -> str:
@@ -62,18 +64,19 @@ def build_sections(
     pages: List[PageInfo],
     page_images: List[str],
     max_pages: int = 0,
+    page_blocks: Optional[List[List[Block]]] = None,
 ) -> List[Section]:
     n_pages = len(pages)
     if max_pages:
         n_pages = min(n_pages, max_pages)
 
     if not outline:
-        return _fallback_sections(pages, page_images, n_pages)
+        return _fallback_sections(pages, page_images, n_pages, page_blocks=page_blocks)
 
     # Keep only outline entries that point into our (possibly truncated) range.
     items = [o for o in outline if o.page < n_pages]
     if not items:
-        return _fallback_sections(pages, page_images, n_pages)
+        return _fallback_sections(pages, page_images, n_pages, page_blocks=page_blocks)
 
     used: Dict[str, int] = {}
     sections: List[Section] = []
@@ -106,12 +109,13 @@ def build_sections(
         )
 
     _assign_parents(sections)
-    _attach_content(sections, pages, page_images, n_pages)
+    _attach_content(sections, pages, page_images, n_pages, page_blocks)
     return sections
 
 
 def _fallback_sections(
-    pages: List[PageInfo], page_images: List[str], n_pages: int, group: int = 4
+    pages: List[PageInfo], page_images: List[str], n_pages: int, group: int = 4,
+    page_blocks: Optional[List[List[Block]]] = None,
 ) -> List[Section]:
     used: Dict[str, int] = {}
     sections: List[Section] = []
@@ -122,7 +126,7 @@ def _fallback_sections(
         sections.append(
             Section(id=sid, slug=sid, title=title, level=1, start_page=start, end_page=end)
         )
-    _attach_content(sections, pages, page_images, n_pages)
+    _attach_content(sections, pages, page_images, n_pages, page_blocks)
     return sections
 
 
@@ -138,17 +142,22 @@ def _assign_parents(sections: List[Section]) -> None:
 
 
 def _attach_content(
-    sections: List[Section], pages: List[PageInfo], page_images: List[str], n_pages: int
+    sections: List[Section], pages: List[PageInfo], page_images: List[str], n_pages: int,
+    page_blocks: Optional[List[List[Block]]] = None,
 ) -> None:
     for sec in sections:
         parts: List[str] = []
         imgs: List[str] = []
+        blocks: List[Block] = []
         for p in range(sec.start_page, min(sec.end_page, n_pages - 1) + 1):
             parts.append(pages[p].text)
             if p < len(page_images):
                 imgs.append(page_images[p])
+            if page_blocks is not None and p < len(page_blocks):
+                blocks.extend(page_blocks[p])
         sec.text = "\n".join(parts).strip()
         sec.page_images = imgs
+        sec.blocks = blocks
 
 
 def map_links_to_sections(links: List[Link], sections: List[Section]) -> Dict[int, str]:

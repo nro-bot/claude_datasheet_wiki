@@ -55,12 +55,23 @@ def run(cfg: Config) -> Path:
     else:
         images = [None] * effective_pages
 
+    # 2b. structured (reflowed) content + inline figures
+    page_blocks = doc.layout_pages(
+        cfg.out_dir / "figures", limit=limit, extract_figures=True, resume=cfg.resume
+    )
+
     # 3. structure
     outline = doc.outline()
     log(f"Outline entries: {len(outline)}")
-    sections = build_sections(outline, pages, images, max_pages=limit)
+    sections = build_sections(outline, pages, images, max_pages=limit, page_blocks=page_blocks)
     log(f"Built {len(sections)} sections")
     doc.close()
+
+    # link whole-page "table" notes to the rendered page image
+    for sec in sections:
+        for blk in sec.blocks:
+            if blk.kind == "table_note" and blk.page < len(images) and images[blk.page]:
+                blk.image_rel = f"images/{images[blk.page]}"
 
     # 4. enrichment (cached)
     backend = get_backend(cfg.backend, model=cfg.model, ollama_host=cfg.ollama_host)

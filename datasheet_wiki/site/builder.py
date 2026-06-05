@@ -11,7 +11,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 from ..enrich.base import Enrichment
 from ..pdf.structure import Section
 from ..utils import Progress, ensure_dir, log
-from .render import build_number_index, build_page_index, render_body
+from .render import build_number_index, build_page_index, render_blocks, render_body
 
 TEMPLATES = Path(__file__).parent / "templates"
 STATIC = Path(__file__).parent / "static"
@@ -110,6 +110,7 @@ class SiteBuilder:
         prog = Progress(len(sections), "render html", enabled=progress)
         for i, sec in enumerate(sections):
             enr = enrichments.get(sec.id) or Enrichment()
+            formatted = render_blocks(sec.blocks, number_index, page_index, root="../")
             body = render_body(sec.text, number_index, page_index, root="../")
             prev_s = sections[i - 1] if i > 0 else None
             next_s = sections[i + 1] if i < len(sections) - 1 else None
@@ -120,6 +121,7 @@ class SiteBuilder:
                 section=sec,
                 breadcrumbs=self._breadcrumbs(sec, by_id),
                 body=body,
+                formatted=formatted,
                 enrichment=enr,
                 images=sec.page_images,
                 prev=({"title": prev_s.title, "url": prev_s.url} if prev_s else None),

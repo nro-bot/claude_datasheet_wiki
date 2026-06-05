@@ -10,6 +10,7 @@ import html
 import re
 from typing import Dict, List, Optional
 
+from ..pdf.blocks import BOLD_END, BOLD_START, Block
 from ..pdf.structure import Section
 
 # "Section 4.3", "section 4.3.1", "Chapter 5", "see 4.3"
@@ -69,6 +70,50 @@ def linkify(text: str, number_index: Dict[str, str], page_index: Dict[int, str],
     escaped = _REF_SECTION.sub(sec_sub, escaped)
     escaped = _REF_PAGE.sub(page_sub, escaped)
     return escaped
+
+
+_HEADING_TAG = {2: "h4", 3: "h5", 4: "h6"}
+
+
+def _inline(text: str, number_index: Dict[str, str], page_index: Dict[int, str], root: str) -> str:
+    """Escape + cross-reference-link text, then turn bold sentinels into <strong>."""
+    out = linkify(text, number_index, page_index, root)
+    out = out.replace(html.escape(BOLD_START), "<strong>").replace(html.escape(BOLD_END), "</strong>")
+    out = out.replace(BOLD_START, "<strong>").replace(BOLD_END, "</strong>")
+    return out
+
+
+def render_blocks(
+    blocks: List[Block], number_index: Dict[str, str], page_index: Dict[int, str], root: str = ""
+) -> str:
+    """Render reflowed/structured blocks (headings, paragraphs, lists, figures,
+    whole-page-table notes) into web HTML."""
+    if not blocks:
+        return ""
+    out: List[str] = []
+    for b in blocks:
+        if b.kind == "heading":
+            tag = _HEADING_TAG.get(b.level, "h5")
+            out.append(f"<{tag} class=\"fmt-h\">{_inline(b.text, number_index, page_index, root)}</{tag}>")
+        elif b.kind == "list":
+            lis = "".join(f"<li>{_inline(i, number_index, page_index, root)}</li>" for i in b.items)
+            out.append(f"<ul class=\"fmt-list\">{lis}</ul>")
+        elif b.kind == "figure":
+            out.append(
+                f'<figure class="dsfig"><img loading="lazy" src="{root}{html.escape(b.image_rel)}" '
+                f'alt="Figure from page {b.page + 1}"></figure>'
+            )
+        elif b.kind == "table_note":
+            if b.image_rel:
+                link = f'<a href="{root}{html.escape(b.image_rel)}" target="_blank" rel="noopener">image of page {b.page + 1}</a>'
+            else:
+                link = f"image of page {b.page + 1}"
+            out.append(f'<p class="tablenote">Detected table — see {link}.</p>')
+        else:  # para
+            txt = _inline(b.text, number_index, page_index, root)
+            if txt.strip():
+                out.append(f"<p>{txt}</p>")
+    return "\n".join(out)
 
 
 def render_body(

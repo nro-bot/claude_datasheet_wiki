@@ -56,10 +56,19 @@
   </section>
   {% endif %}
 
-  <section class="bodytext">
-    <h2>Text</h2>
-    {{ body | safe }}
+  {% if formatted %}
+  <section class="formatted">
+    <h2>Formatted text</h2>
+    {{ formatted | safe }}
   </section>
+  {% endif %}
+
+  <details class="rawtext">
+    <summary>Raw extracted text</summary>
+    <div class="bodytext">
+      {{ body | safe }}
+    </div>
+  </details>
 
   {% if images %}
   <section class="pageimages">
