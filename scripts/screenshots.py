@@ -60,6 +60,12 @@ def shot(html_path: Path, out_jpg: Path, scale: float = 1.25, max_h: int = 2000)
     out_jpg.write_bytes(pix.tobytes(output="jpeg", jpg_quality=72))
     doc.close()
     print(f"{out_jpg}  {out_jpg.stat().st_size // 1024} KB  ({pix.width}x{pix.height})")
+    # A render that trims down to little more than the top bar means WeasyPrint
+    # didn't lay out the body (missing system libs, an empty page, etc.). Warn
+    # loudly so a broken sliver doesn't get silently committed.
+    if pix.height < int(200 * scale):
+        print(f"  WARNING: {out_jpg.name} is only {pix.height}px tall — the page "
+              f"body likely failed to render; do not commit this.", file=sys.stderr)
 
 
 if __name__ == "__main__":
