@@ -8,13 +8,13 @@ become real wiki hyperlinks in the small/no-LLM tier.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Tuple
 
 import fitz  # PyMuPDF
 
-from ..utils import Progress, ensure_dir, log
+from ..utils import Progress, ensure_dir
 
 
 @dataclass
@@ -149,7 +149,6 @@ class PdfDocument:
         """Structured, web-ready blocks per page (headings, paragraphs, lists,
         inline figures, whole-page-table notes)."""
         from .layout import extract_page_blocks
-        from ..utils import Progress
 
         n = self.page_count if not limit else min(limit, self.page_count)
         out = []

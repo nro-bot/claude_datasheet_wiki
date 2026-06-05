@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import html
 import re
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from ..pdf.blocks import BOLD_END, BOLD_START, Block
 from ..pdf.structure import Section
@@ -17,8 +17,6 @@ from ..pdf.structure import Section
 _REF_SECTION = re.compile(
     r"\b(?:(?:see\s+)?(?:Section|Sections|Chapter|Chapters)\s+)(\d+(?:\.\d+)*)", re.IGNORECASE
 )
-# "Table 10-1", "Figure 4-2", "Table 10.1"
-_REF_FIGTAB = re.compile(r"\b((?:Table|Figure)\s+\d+[.\-]\d+[A-Za-z]?)\b", re.IGNORECASE)
 # "page 42", "pages 42-44"
 _REF_PAGE = re.compile(r"\bpages?\s+(\d+)", re.IGNORECASE)
 

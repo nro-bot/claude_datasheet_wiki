@@ -23,8 +23,7 @@ from .pdf.extract import PdfDocument
 from .pdf.structure import build_sections
 from .search.index import build_search_index, write_search_index
 from .site.builder import SiteBuilder
-from .site.render import build_number_index
-from .utils import Progress, ensure_dir, log, read_json, sha1_file, sha1_text, write_json
+from .utils import Progress, ensure_dir, log, read_json, sha1_text, write_json
 
 
 def _enrich_cache_key(cfg: Config, title: str, text: str) -> str:

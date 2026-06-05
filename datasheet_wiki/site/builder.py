@@ -11,7 +11,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from ..enrich.base import Enrichment
 from ..pdf.structure import Section
-from ..utils import Progress, ensure_dir, log, slugify
+from ..utils import Progress, ensure_dir, slugify
 from .render import build_number_index, build_page_index, render_blocks, render_body
 
 TEMPLATES = Path(__file__).parent / "templates"
