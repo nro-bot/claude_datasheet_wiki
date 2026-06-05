@@ -11,8 +11,14 @@ def test_core_pages_exist(wiki: Path):
     for name in ("index.html", "search.html", "about.html"):
         assert (wiki / name).exists()
     assert (wiki / "data" / "search-index.js").exists()
-    assert (wiki / "assets" / "nav.js").exists()
     assert len(list((wiki / "sections").glob("*.html"))) == 5
+
+
+def test_sidebar_nav_is_server_rendered(wiki: Path):
+    # Navigation must work without JS: the section tree is in the HTML itself.
+    index = (wiki / "index.html").read_text()
+    assert 'id="nav-tree"' in index
+    assert "sections/1-overview.html" in index  # a nav link, server-side
 
 
 def test_page_images_rendered(wiki: Path):

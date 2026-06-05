@@ -1,67 +1,41 @@
-// Sidebar navigation: render the tree from window.DSW_NAV, support collapse,
-// and highlight the current page. Works fully offline (no fetch).
+// Progressive enhancement for the (server-rendered) sidebar navigation.
+// The nav tree is already in the HTML, so navigation works with JS disabled.
+// This adds collapsible branches, mobile menu toggle, and current-page focus.
 (function () {
-  var root = window.DSW_ROOT || "";
-  var here = location.pathname.split("/").pop();
+  var tree = document.getElementById("nav-tree");
 
-  function build(nodes) {
-    var ul = document.createElement("ul");
-    nodes.forEach(function (n) {
-      var li = document.createElement("li");
-      var row = document.createElement("div");
-      row.className = "row";
-      var hasKids = n.children && n.children.length;
-      var toggle = document.createElement("span");
-      toggle.className = "toggle";
-      toggle.textContent = hasKids ? "▸" : "";
-      row.appendChild(toggle);
-
-      var a = document.createElement("a");
-      a.href = root + n.url;
-      if (n.number) {
-        var num = document.createElement("span");
-        num.className = "secnum";
-        num.textContent = n.number;
-        a.appendChild(num);
-        a.appendChild(document.createTextNode(" "));
-      }
-      a.appendChild(document.createTextNode(n.title));
-      row.appendChild(a);
-      li.appendChild(row);
-
-      var isCurrent = n.url.split("/").pop() === here;
-      if (isCurrent) li.classList.add("current");
-
-      if (hasKids) {
-        var sub = build(n.children);
-        li.appendChild(sub);
-        li.classList.add("collapsed");
+  if (tree) {
+    // collapse every branch, then re-open the path to the current page
+    var branches = tree.querySelectorAll("li");
+    branches.forEach(function (li) {
+      var sub = li.querySelector(":scope > ul");
+      var toggle = li.querySelector(":scope > .row > .toggle");
+      if (!sub) return;
+      li.classList.add("collapsed");
+      if (toggle) {
+        toggle.textContent = "▸";
+        toggle.style.cursor = "pointer";
         toggle.addEventListener("click", function (e) {
           e.preventDefault();
-          li.classList.toggle("collapsed");
-          toggle.textContent = li.classList.contains("collapsed") ? "▸" : "▾";
+          var collapsed = li.classList.toggle("collapsed");
+          toggle.textContent = collapsed ? "▸" : "▾";
         });
-        // auto-expand the branch containing the current page
-        if (containsCurrent(n)) {
-          li.classList.remove("collapsed");
-          toggle.textContent = "▾";
-        }
       }
-      ul.appendChild(li);
     });
-    return ul;
-  }
 
-  function containsCurrent(node) {
-    if (node.url.split("/").pop() === here) return true;
-    return (node.children || []).some(containsCurrent);
-  }
-
-  var tree = document.getElementById("nav-tree");
-  if (tree && window.DSW_NAV) {
-    tree.appendChild(build(window.DSW_NAV));
-    var cur = tree.querySelector(".current");
-    if (cur) cur.scrollIntoView({ block: "center" });
+    var current = tree.querySelector(".current");
+    if (current) {
+      var node = current;
+      while (node && node !== tree) {
+        if (node.tagName === "LI" && node.classList.contains("collapsed")) {
+          node.classList.remove("collapsed");
+          var t = node.querySelector(":scope > .row > .toggle");
+          if (t && t.textContent) t.textContent = "▾";
+        }
+        node = node.parentElement;
+      }
+      current.scrollIntoView({ block: "center" });
+    }
   }
 
   var toggle = document.getElementById("menu-toggle");

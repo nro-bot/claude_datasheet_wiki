@@ -1,3 +1,16 @@
+{% macro navtree(nodes, current_url, root) %}
+<ul>
+  {% for n in nodes %}
+  <li{% if n.url == current_url %} class="current"{% endif %}>
+    <div class="row">
+      <span class="toggle">{% if n.children %}▾{% endif %}</span>
+      <a href="{{ root }}{{ n.url }}">{% if n.number %}<span class="secnum">{{ n.number }}</span> {% endif %}{{ n.title }}</a>
+    </div>
+    {% if n.children %}{{ navtree(n.children, current_url, root) }}{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% endmacro %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,7 +32,7 @@
     <div class="sidebar-inner">
       <a class="nav-home" href="{{ root }}index.html">Overview</a>
       <a class="nav-home" href="{{ root }}search.html">Search</a>
-      <div id="nav-tree" class="nav-tree"></div>
+      <div id="nav-tree" class="nav-tree">{{ navtree(nav, current_url, root) }}</div>
       <a class="nav-home about" href="{{ root }}about.html">About &amp; copyright</a>
     </div>
   </nav>
@@ -32,7 +45,6 @@
   </main>
 </div>
 <script>window.DSW_ROOT = "{{ root }}";</script>
-<script src="{{ root }}assets/nav.js"></script>
 <script src="{{ root }}assets/app.js"></script>
 {% block scripts %}{% endblock %}
 </body>

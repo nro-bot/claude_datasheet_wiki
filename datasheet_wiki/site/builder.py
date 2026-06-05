@@ -1,7 +1,6 @@
 """Render the static site with Jinja2."""
 from __future__ import annotations
 
-import json
 import shutil
 from datetime import date
 from pathlib import Path
@@ -78,11 +77,6 @@ class SiteBuilder:
                 old.unlink()
         ensure_dir(sections_dir)
 
-        # write nav as a JS global so every page can render the sidebar offline
-        (self.out / "assets" / "nav.js").write_text(
-            "window.DSW_NAV = " + json.dumps(nav, ensure_ascii=False) + ";\n", encoding="utf-8"
-        )
-
         common = {
             "meta": self.meta,
             "nav": nav,
@@ -101,15 +95,15 @@ class SiteBuilder:
         self._write(
             "index.html",
             self.env.get_template("index.html").render(
-                root="", page="home",
+                root="", page="home", current_url="",
                 top_sections=top_sections,
                 stats={"sections": len(sections), "registers": total_regs,
                        "code": total_code, "pages": self.meta.get("page_count", 0)},
                 **common,
             ),
         )
-        self._write("search.html", self.env.get_template("search.html").render(root="", page="search", **common))
-        self._write("about.html", self.env.get_template("about.html").render(root="", page="about", **common))
+        self._write("search.html", self.env.get_template("search.html").render(root="", page="search", current_url="", **common))
+        self._write("about.html", self.env.get_template("about.html").render(root="", page="about", current_url="", **common))
 
         # section pages
         tmpl = self.env.get_template("section.html")
@@ -122,6 +116,7 @@ class SiteBuilder:
             html_out = tmpl.render(
                 root="../",
                 page="section",
+                current_url=sec.url,
                 section=sec,
                 breadcrumbs=self._breadcrumbs(sec, by_id),
                 body=body,

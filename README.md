@@ -14,6 +14,19 @@ that's fine — you only do it once per datasheet.
 > local. Datasheet PDFs and generated sites are git-ignored, so nothing
 > copyrighted ever lands in this repo.
 
+## Screenshots
+
+The screenshots below are generated from a small **synthetic** "FOO85" datasheet
+(authored for this repo, no copyright) so they can live in version control.
+
+| Overview | Section (registers + code) |
+|----------|----------------------------|
+| ![Overview page](docs/screenshots/overview.jpg) | ![Section page with registers and code](docs/screenshots/section-registers-code.jpg) |
+
+A section page: server-rendered section tree (highlighting the current page), an
+auto-generated summary with keyword tags, a detected register bit-field table,
+a code example, the cleaned-up text, and an image of the original PDF page.
+
 ---
 
 ## Why
