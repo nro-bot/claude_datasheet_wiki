@@ -82,6 +82,38 @@ def test_section_number_not_duplicated(wiki: Path):
     assert "2 2 Pin Configuration" not in index
 
 
+def test_page_manifest(wiki: Path):
+    js = (wiki / "assets" / "pages.js").read_text()
+    assert "window.DSW_PAGES=" in js and "window.DSW_ID=" in js
+    assert "page-0001.png" in js  # page image referenced
+    assert '"n":1' in js
+
+
+def test_register_map_page(wiki: Path):
+    reg = (wiki / "registers.html").read_text()
+    assert "Register map" in reg
+    assert "DDRB" in reg and 'table class="bits"' in reg
+    assert "registers.html" in (wiki / "index.html").read_text()  # nav link
+
+
+def test_reference_and_starred_pages(wiki: Path):
+    for name in ("reference.html", "starred.html"):
+        html = (wiki / name).read_text()
+        assert "assets/pages.js" in html and "assets/gallery.js" in html
+        assert 'id="gallery"' in html
+    ref = (wiki / "reference.html").read_text()
+    assert 'id="pagespec"' in ref and 'id="page-search"' in ref
+    # bookmark/calculator engines load everywhere
+    assert (wiki / "assets" / "bookmarks.js").exists()
+    assert (wiki / "assets" / "calc.js").exists()
+    assert (wiki / "assets" / "gallery.js").exists()
+
+
+def test_thumbnails_carry_page_number(wiki: Path):
+    sec = (wiki / "sections" / "2-pin-configuration.html").read_text()
+    assert 'class="thumb" data-page="2"' in sec  # star toggle target
+
+
 def test_lightbox_wired(wiki: Path):
     assert (wiki / "assets" / "lightbox.js").exists()
     section = (wiki / "sections" / "2-pin-configuration.html").read_text()

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Register map{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>Register map</h1>
+  {% if reg_groups %}
+  <p class="lead">{{ register_count }} register{{ '' if register_count == 1 else 's' }}
+    across {{ reg_groups|length }} section{{ '' if reg_groups|length == 1 else 's' }}.
+    Each has an interactive bit-field calculator.</p>
+
+  <ul class="toc">
+    {% for g in reg_groups %}
+    <li><a href="#{{ g.id }}">{% if g.number %}<span class="secnum">{{ g.number }}</span> {% endif %}{{ g.title }}</a>
+      <span class="muted">{{ g.registers|length }}×</span></li>
+    {% endfor %}
+  </ul>
+
+  {% for g in reg_groups %}
+  <section class="reg-group" id="{{ g.id }}">
+    <h2><a href="{{ root }}{{ g.url }}#registers">{% if g.number %}{{ g.number }} {% endif %}{{ g.title }}</a></h2>
+    {% for r in g.registers %}
+    <div class="register">
+      <h3>{{ r.name }}{% if r.address %} <code class="addr">{{ r.address }}</code>{% endif %}</h3>
+      {% if r.description %}<p>{{ r.description }}</p>{% endif %}
+      {% if r.fields %}
+      <table class="bits">
+        <thead><tr><th>Bits</th><th>Name</th><th>Access</th><th>Description</th></tr></thead>
+        <tbody>
+        {% for f in r.fields %}
+          <tr><td>{{ f.bits }}</td><td><code>{{ f.name }}</code></td><td>{{ f.access }}</td><td>{{ f.description }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+  {% endfor %}
+  {% else %}
+  <p class="muted">No registers were detected. The heuristic (small) tier finds
+  "<code>NAME – … Register</code>" headings and "<code>Bit n – FIELD</code>" rows;
+  the medium and large tiers extract them more thoroughly with an LLM.</p>
+  {% endif %}
+</article>
+{% endblock %}

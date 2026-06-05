@@ -156,7 +156,12 @@ details.rawtext .bodytext p { color: var(--muted); }
 
 /* page images */
 .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-.thumb { margin: 0; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--panel); }
+.thumb { position: relative; margin: 0; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--panel); }
+.star { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; border-radius: 50%;
+  border: 1px solid var(--border); background: rgba(0,0,0,.45); color: #9aa3b2; cursor: pointer;
+  font-size: 16px; line-height: 1; display: flex; align-items: center; justify-content: center; z-index: 2; }
+.star:hover { color: #fff; }
+.star.on { color: var(--accent2); background: rgba(0,0,0,.65); border-color: var(--accent2); }
 .thumb a { display: block; background: #fff; }
 .thumb img { width: 100%; display: block; }
 .thumb figcaption { padding: 5px 6px; font-size: 12px; color: var(--muted); text-align: center;
@@ -205,4 +210,52 @@ body.lb-open { overflow: hidden; }
   body.nav-open .sidebar { transform: translateX(0); }
   .content { padding: 20px 18px 50px; }
   .topsearch input { width: 130px; }
+}
+
+/* reference / starred galleries */
+.gallery-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 16px 0 4px; }
+.size-ctl { margin-left: auto; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+.size-ctl input[type="range"] { vertical-align: middle; }
+.ref-gallery { display: grid; gap: 14px; margin-top: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(var(--thumb-w, 220px), 1fr)); }
+.ref-gallery .empty { padding: 18px 0; }
+.ref-gallery .noimg { aspect-ratio: 3 / 4; background: var(--panel); border: 1px dashed var(--border);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: var(--muted); font-size: 13px; text-align: center; padding: 8px; }
+.ref-gallery .noimg span { font-size: 11px; }
+
+/* reference builder inputs */
+.field-label { display: block; font-size: 13px; color: var(--muted); margin: 16px 0 6px; }
+.finder { margin-top: 8px; }
+.search-results { margin-top: 8px; max-height: 340px; overflow: auto; }
+.search-results .sr { padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.search-results .add { background: var(--accent); color: #04121d; border: 0; border-radius: 6px;
+  padding: 2px 9px; cursor: pointer; font-weight: 600; margin-right: 8px; }
+.search-results .sr-sec { color: var(--text); margin-right: 6px; }
+
+/* register map */
+.reg-group { margin-top: 30px; }
+.reg-group h2 a { color: var(--text); }
+
+/* bit-field calculator */
+details.bitcalc { margin: 10px 0 4px; border: 1px solid var(--border); border-radius: 8px; background: var(--code-bg); }
+details.bitcalc > summary { cursor: pointer; padding: 8px 12px; color: var(--muted); font-size: 12px;
+  text-transform: uppercase; letter-spacing: .04em; }
+.bc-body { padding: 4px 12px 12px; }
+table.bc-fields { width: auto; border-collapse: collapse; margin: 6px 0; font-size: 14px; }
+table.bc-fields td { padding: 3px 12px 3px 0; border: 0; vertical-align: middle; }
+.bc-bits { color: var(--accent2); font-variant-numeric: tabular-nums; }
+.bc-out { display: flex; gap: 20px; flex-wrap: wrap; align-items: center; margin-top: 10px;
+  padding-top: 10px; border-top: 1px solid var(--border); }
+.bc-out label { font-size: 13px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+.bc-hex { color: var(--accent); font-size: 16px; }
+.bc-bin { color: var(--text); letter-spacing: .5px; font-size: 13px; }
+.bc-out input, table.bc-fields input[type="number"] { background: var(--panel2); border: 1px solid var(--border);
+  color: var(--text); border-radius: 6px; padding: 3px 6px; }
+
+@media print {
+  .topbar, .sidebar, .gallery-controls, .pagefoot, .prevnext, .section-toc { display: none !important; }
+  .layout { display: block; }
+  .content { padding: 0; max-width: none; }
+  .ref-gallery .star { display: none; }
 }

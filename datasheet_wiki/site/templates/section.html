@@ -35,7 +35,7 @@
     <h2>Source pages {{ pl('source', 'Source pages') }}</h2>
     <div class="thumbs">
       {% for img in page_imgs %}
-      <figure class="thumb">
+      <figure class="thumb" data-page="{{ section.start_page + loop.index0 + 1 }}">
         <a href="{{ root }}images/{{ img }}" target="_blank" rel="noopener">
           <img loading="lazy" src="{{ root }}images/{{ img }}" alt="Datasheet page {{ section.start_page + loop.index0 + 1 }}">
         </a>

@@ -60,8 +60,13 @@ class SiteBuilder:
         self,
         sections: List[Section],
         enrichments: Dict[str, Enrichment],
+        pages_manifest: Optional[List[dict]] = None,
         progress: bool = True,
     ) -> None:
+        import json
+
+        from ..utils import slugify
+
         by_id = {s.id: s for s in sections}
         number_index = build_number_index(sections)
         page_index = build_page_index(sections)
@@ -77,11 +82,23 @@ class SiteBuilder:
                 old.unlink()
         ensure_dir(sections_dir)
 
+        wiki_id = slugify(self.meta.get("source_name") or self.meta.get("title") or "datasheet")
+        has_pages = bool(pages_manifest)
+        # page manifest as a JS global (works over file://)
+        ensure_dir(self.out / "assets")
+        (self.out / "assets" / "pages.js").write_text(
+            "window.DSW_ID=" + json.dumps(wiki_id) + ";\n"
+            "window.DSW_PAGES=" + json.dumps(pages_manifest or [], ensure_ascii=False, separators=(",", ":")) + ";\n",
+            encoding="utf-8",
+        )
+
         common = {
             "meta": self.meta,
             "nav": nav,
             "generated": date.today().isoformat(),
             "section_count": len(sections),
+            "wiki_id": wiki_id,
+            "has_pages": has_pages,
         }
 
         # index page
@@ -117,6 +134,25 @@ class SiteBuilder:
                 code_groups=code_groups, code_count=total_code, **common,
             ),
         )
+        # register map index
+        reg_groups = []
+        for sec in sections:
+            regs = (enrichments.get(sec.id) or Enrichment()).registers
+            if regs:
+                reg_groups.append({"id": sec.id, "title": sec.short_title, "number": sec.number,
+                                   "url": sec.url, "registers": regs})
+        self._write(
+            "registers.html",
+            self.env.get_template("registers.html").render(
+                root="", page="registers", current_url="",
+                reg_groups=reg_groups, register_count=total_regs, **common,
+            ),
+        )
+
+        # reference builder + personal (starred) reference — both client-side
+        self._write("reference.html", self.env.get_template("reference.html").render(root="", page="reference", current_url="", **common))
+        self._write("starred.html", self.env.get_template("starred.html").render(root="", page="starred", current_url="", **common))
+
         self._write("how.html", self.env.get_template("how.html").render(root="", page="how", current_url="", **common))
         self._write("about.html", self.env.get_template("about.html").render(root="", page="about", current_url="", **common))
 

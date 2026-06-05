@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Personal Reference{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>Personal Reference</h1>
+  <p class="lead">Your starred datasheet pages, as a thumbnail gallery. Open any
+  section and click the ★ on a source page to add it here. Saved in your browser
+  (per datasheet).</p>
+
+  <div id="controls" class="gallery-controls">
+    <button id="clear-all" class="btn btn-ghost" type="button">Clear all</button>
+    <button id="print" class="btn btn-ghost" type="button">Print</button>
+  </div>
+  <p id="status" class="muted"></p>
+  <div id="gallery" class="ref-gallery"></div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ root }}assets/pages.js"></script>
+<script src="{{ root }}assets/gallery.js"></script>
+{% endblock %}

@@ -128,6 +128,27 @@ def run(cfg: Config) -> Path:
             semantic_ok = True
             log(f"Semantic index: {n} chunks embedded locally.")
 
+    # page manifest: maps every page -> its image, owning section, and text
+    # (used by the reference/bookmark pages and page-level search).
+    page_to_sec = {}
+    for sec in sections:
+        for p in range(sec.start_page, sec.end_page + 1):
+            cur = page_to_sec.get(p)
+            if cur is None or sec.level > cur.level:
+                page_to_sec[p] = sec
+    pages_manifest = []
+    for p in range(effective_pages):
+        sec = page_to_sec.get(p)
+        img = images[p] if p < len(images) and images[p] else ""
+        pages_manifest.append({
+            "n": p + 1,
+            "img": f"images/{img}" if img else "",
+            "sec": sec.short_title if sec else "",
+            "num": sec.number if sec else "",
+            "url": sec.url if sec else "",
+            "t": (pages[p].text or "")[:2500] if p < len(pages) else "",
+        })
+
     # 6. site
     log("Rendering site...")
     meta = {
@@ -140,7 +161,9 @@ def run(cfg: Config) -> Path:
         "dpi": cfg.dpi,
         "semantic": semantic_ok,
     }
-    SiteBuilder(cfg.out_dir, meta).build(sections, enrichments, progress=cfg.progress)
+    SiteBuilder(cfg.out_dir, meta).build(
+        sections, enrichments, pages_manifest=pages_manifest, progress=cfg.progress
+    )
 
     dt = time.time() - t0
     log(f"Done in {dt:.0f}s → {cfg.out_dir}/index.html")

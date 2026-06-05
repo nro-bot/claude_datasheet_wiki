@@ -51,6 +51,24 @@ section tree, the original page images side-by-side with cleaned-up text, and �
 if you want — AI summaries and usage examples. Host it locally, link to it, grep
 it, keep it forever.
 
+## Tools for embedded engineers
+
+Beyond the per-section pages, every generated wiki includes:
+
+- **Register map** (`registers.html`) — every detected register in one place, each
+  with an **interactive bit-field calculator**: tick field values to get the
+  register's hex/binary, or paste a hex value to decode it back into fields.
+- **Reference builder** (`reference.html`) — make a printable thumbnail cheat-sheet
+  from any pages (`1, 3, 5-8, 12`); a built-in **page search** finds page numbers
+  by keyword so you can add them, and the result is shareable via URL.
+- **Personal Reference** (`starred.html`) — ★ any source page and it lands in a
+  thumbnail gallery (adjustable thumbnail size), saved in your browser per
+  datasheet.
+- **Code examples** index, **full-text search** (+ optional local semantic search),
+  an **image lightbox**, and heading **permalinks**.
+
+All of these run entirely client-side and work offline.
+
 ## Three compute tiers (incl. fully local, no API)
 
 | Tier | Backend | What you get | Needs |

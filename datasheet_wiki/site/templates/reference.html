@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Reference builder{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>Reference builder</h1>
+  <p class="lead">Make a printable thumbnail gallery from any pages you choose —
+  a one-page cheat-sheet of the bits you keep flipping back to.</p>
+
+  <label class="field-label" for="pagespec">Pages (comma-separated, ranges allowed)</label>
+  <input id="pagespec" class="bigsearch" placeholder="e.g.  1, 3, 5-8, 12" autocomplete="off">
+
+  <div class="finder">
+    <label class="field-label" for="page-search">Don't know the page numbers? Search the datasheet</label>
+    <input id="page-search" class="bigsearch" placeholder="Search text to find pages, then click + to add" autocomplete="off">
+    <div id="search-results" class="search-results"></div>
+  </div>
+
+  <div id="controls" class="gallery-controls">
+    <button id="star-all" class="btn btn-ghost" type="button">★ Star all listed</button>
+    <button id="copy-link" class="btn btn-ghost" type="button">Copy shareable link</button>
+  </div>
+  <p id="status" class="muted"></p>
+  <div id="gallery" class="ref-gallery"></div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ root }}assets/pages.js"></script>
+<script src="{{ root }}assets/gallery.js"></script>
+{% endblock %}
