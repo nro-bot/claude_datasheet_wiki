@@ -156,7 +156,27 @@ def test_register_map_page(wiki: Path):
 def test_gallery_lightbox_wiring(wiki: Path):
     gjs = (wiki / "assets" / "gallery.js").read_text()
     assert "DSWLightbox.open" in gjs and 'class="shot"' in gjs  # tiles open the lightbox
-    assert "window.DSWLightbox" in (wiki / "assets" / "lightbox.js").read_text()
+    lb = (wiki / "assets" / "lightbox.js").read_text()
+    assert "window.DSWLightbox" in lb
+    assert "lb-star" in lb and "DSWStars" in lb  # star + nav from the lightbox
+
+
+def test_header_nav_and_clean_sidebar(wiki: Path):
+    index = (wiki / "index.html").read_text()
+    # tool links live in the header now
+    assert 'class="topnav"' in index
+    for href in ("registers.html", "code.html", "reference.html", "starred.html", "notes.html", "glossary.html"):
+        assert f'class="topnav"' in index and href in index
+    # sidebar keeps only Overview / tree / How / About — no Search link
+    sidebar = index.split('id="sidebar"')[1].split("</nav>")[0]
+    assert "search.html" not in sidebar and "registers.html" not in sidebar
+    assert "index.html" in sidebar and "about.html" in sidebar
+
+
+def test_section_top_arrows_and_no_tags(wiki: Path):
+    html = (wiki / "sections" / "2-pin-configuration.html").read_text()
+    assert 'class="prevnext-top"' in html       # duplicated arrows at the top
+    assert 'class="tags"' not in html           # keyword tags removed from summary
 
 
 def test_reference_and_starred_pages(wiki: Path):

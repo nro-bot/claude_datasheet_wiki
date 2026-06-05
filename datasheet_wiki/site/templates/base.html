@@ -25,6 +25,14 @@
 <header class="topbar">
   <button id="menu-toggle" aria-label="Toggle navigation">☰</button>
   <a class="brand" href="{{ root }}index.html">{{ meta.title }}</a>
+  <nav class="topnav" aria-label="Tools">
+    <a href="{{ root }}registers.html">Registers</a>
+    <a href="{{ root }}code.html">Code examples</a>
+    <a href="{{ root }}reference.html">Reference builder</a>
+    <a href="{{ root }}starred.html">★ Starred</a>
+    <a href="{{ root }}notes.html">My notes</a>
+    <a href="{{ root }}glossary.html">Glossary</a>
+  </nav>
   <button id="cmdk" class="cmdk-btn" type="button" title="Quick jump (Ctrl/⌘ K)" aria-label="Quick jump">⌘K</button>
   <form class="topsearch" action="{{ root }}search.html" method="get">
     <input type="search" name="q" placeholder="Search…" aria-label="Search">
@@ -34,13 +42,6 @@
   <nav id="sidebar" class="sidebar" aria-label="Datasheet sections">
     <div class="sidebar-inner">
       <a class="nav-home" href="{{ root }}index.html">Overview</a>
-      <a class="nav-home" href="{{ root }}search.html">Search</a>
-      <a class="nav-home" href="{{ root }}registers.html">Registers</a>
-      <a class="nav-home" href="{{ root }}code.html">Code examples</a>
-      <a class="nav-home" href="{{ root }}reference.html">Reference builder</a>
-      <a class="nav-home" href="{{ root }}starred.html">★ Starred pages</a>
-      <a class="nav-home" href="{{ root }}notes.html">My notes</a>
-      <a class="nav-home" href="{{ root }}glossary.html">Glossary</a>
       <div id="nav-tree" class="nav-tree">{{ navtree(nav, current_url, root) }}</div>
       <a class="nav-home about" href="{{ root }}how.html">How it's generated</a>
       <a class="nav-home" href="{{ root }}about.html">About &amp; copyright</a>

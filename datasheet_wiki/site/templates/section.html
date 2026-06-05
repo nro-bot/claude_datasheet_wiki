@@ -4,6 +4,11 @@
 {% macro pl(anchor, label) %}<a class="permalink" href="#{{ anchor }}" aria-label="Permalink to {{ label }}" title="Copy link to this section">#</a>{% endmacro %}
 {% block content %}
 <article class="prose section">
+  <nav class="prevnext-top" aria-label="Previous / next section">
+    {% if prev %}<a href="{{ root }}{{ prev.url }}" rel="prev" title="{{ prev.title }}">‹</a>{% else %}<span>‹</span>{% endif %}
+    {% if next %}<a href="{{ root }}{{ next.url }}" rel="next" title="{{ next.title }}">›</a>{% else %}<span>›</span>{% endif %}
+  </nav>
+
   <nav class="crumbs">
     {% for c in breadcrumbs %}
       {% if not loop.last %}<a href="{{ root }}{{ c.url }}">{{ c.title }}</a> ›
@@ -17,9 +22,6 @@
   <div class="summary" id="summary">
     <h2>Summary <span class="from">generated from {{ section.page_label }}</span> {{ m.prov(enrichment.backend, meta.model) }} {{ pl('summary', 'Summary') }}</h2>
     <p>{{ summary_html | safe }}</p>
-    {% if enrichment.keywords %}
-    <p class="tags">{% for k in enrichment.keywords %}<span class="tag">{{ k }}</span>{% endfor %}</p>
-    {% endif %}
   </div>
   {% endif %}
 

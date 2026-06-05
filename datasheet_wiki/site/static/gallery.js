@@ -32,7 +32,7 @@
       var inner;
       if (p && p.img) {
         var i = currentItems.length;
-        currentItems.push({ src: p.img, caption: "Page " + n + (p && p.sec ? " · " + p.sec : "") });
+        currentItems.push({ src: p.img, caption: "Page " + n + (p && p.sec ? " · " + p.sec : ""), page: n });
         inner = '<a class="shot" href="' + p.img + '" data-idx="' + i + '"><img loading="lazy" src="' + p.img + '" alt="Page ' + n + '"></a>';
       } else {
         inner = '<div class="noimg">Page ' + n + (p ? "" : " — out of range") + "<br><span>no image</span></div>";
