@@ -3,7 +3,7 @@
 // window.DSWStars for the reference/starred pages. Falls back to an in-memory
 // store if localStorage is unavailable (e.g. some browsers over file://).
 (function () {
-  var KEY = "dsw:" + (window.DSW_ID || "datasheet") + ":stars";
+  var KEY = window.DSW.key("stars");
   var mem = null; // in-memory fallback
   var subs = [];
 

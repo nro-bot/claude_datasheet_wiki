@@ -86,7 +86,7 @@
     if (box) box.setAttribute("hidden", "");
     document.body.classList.remove("pal-open");
   }
-  function esc(s) { return (s || "").replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  var esc = window.DSW.esc;
 
   document.addEventListener("keydown", function (ev) {
     if ((ev.ctrlKey || ev.metaKey) && (ev.key === "k" || ev.key === "K")) {

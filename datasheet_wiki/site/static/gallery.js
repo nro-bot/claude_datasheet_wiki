@@ -9,17 +9,13 @@
   var mode = document.body.getAttribute("data-page"); // "reference" | "starred"
 
   // ---- thumbnail-size preference (shared, persisted) ----
-  var SIZE_KEY = "dsw:" + (window.DSW_ID || "datasheet") + ":thumbsize";
+  var SIZE_KEY = window.DSW.key("thumbsize");
   function savedSize() {
     try { return parseInt(localStorage.getItem(SIZE_KEY), 10) || 220; } catch (e) { return 220; }
   }
   function saveSize(v) { try { localStorage.setItem(SIZE_KEY, v); } catch (e) {} }
 
-  function escapeHtml(s) {
-    return (s || "").replace(/[&<>"]/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
-    });
-  }
+  var escapeHtml = window.DSW.esc;
 
   function figureHTML(n) {
     var p = byNum[n];

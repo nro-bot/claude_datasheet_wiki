@@ -1,0 +1,25 @@
+{# Shared markup used by section.html, registers.html and code.html. #}
+
+{% macro register_block(r) %}
+<div class="register">
+  <h3>{{ r.name }}{% if r.address %} <code class="addr">{{ r.address }}</code>{% endif %}</h3>
+  {% if r.description %}<p>{{ r.description }}</p>{% endif %}
+  {% if r.fields %}
+  <table class="bits">
+    <thead><tr><th>Bits</th><th>Name</th><th>Access</th><th>Description</th></tr></thead>
+    <tbody>
+    {% for f in r.fields %}
+      <tr><td>{{ f.bits }}</td><td><code>{{ f.name }}</code></td><td>{{ f.access }}</td><td>{{ f.description }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro code_figure(c) %}
+<figure class="code">
+  <figcaption>{{ c.title }} <span class="lang">{{ c.language }}</span></figcaption>
+  <pre><code class="lang-{{ c.language }}">{{ c.code }}</code></pre>
+</figure>
+{% endmacro %}

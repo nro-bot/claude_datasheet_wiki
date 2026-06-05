@@ -1,6 +1,7 @@
 """Render the static site with Jinja2."""
 from __future__ import annotations
 
+import json
 import shutil
 from datetime import date
 from pathlib import Path
@@ -10,7 +11,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from ..enrich.base import Enrichment
 from ..pdf.structure import Section
-from ..utils import Progress, ensure_dir, log
+from ..utils import Progress, ensure_dir, log, slugify
 from .render import build_number_index, build_page_index, render_blocks, render_body
 
 TEMPLATES = Path(__file__).parent / "templates"
@@ -63,15 +64,10 @@ class SiteBuilder:
         pages_manifest: Optional[List[dict]] = None,
         progress: bool = True,
     ) -> None:
-        import json
-
-        from ..utils import slugify
-
         by_id = {s.id: s for s in sections}
         number_index = build_number_index(sections)
         page_index = build_page_index(sections)
         nav = self._nav_tree(sections, by_id)
-        breadcrumbs_map = {s.id: " › ".join(b["title"] for b in self._breadcrumbs(s, by_id)) for s in sections}
 
         self.copy_static()
         # Clear stale section pages from a previous build (ids can change between
@@ -83,7 +79,6 @@ class SiteBuilder:
         ensure_dir(sections_dir)
 
         wiki_id = slugify(self.meta.get("source_name") or self.meta.get("title") or "datasheet")
-        has_pages = bool(pages_manifest)
         # page manifest as a JS global (works over file://)
         ensure_dir(self.out / "assets")
         (self.out / "assets" / "pages.js").write_text(
@@ -117,7 +112,6 @@ class SiteBuilder:
             "generated": date.today().isoformat(),
             "section_count": len(sections),
             "wiki_id": wiki_id,
-            "has_pages": has_pages,
         }
 
         # index page

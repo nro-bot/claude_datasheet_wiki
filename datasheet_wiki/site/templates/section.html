@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 {% block title %}{{ section.title }}{% endblock %}
 {% macro pl(anchor, label) %}<a class="permalink" href="#{{ anchor }}" aria-label="Permalink to {{ label }}" title="Copy link to this section">#</a>{% endmacro %}
 {% block content %}
@@ -49,34 +50,14 @@
   {% if enrichment.registers %}
   <section class="registers" id="registers">
     <h2>Registers {{ pl('registers', 'Registers') }}</h2>
-    {% for r in enrichment.registers %}
-    <div class="register">
-      <h3>{{ r.name }}{% if r.address %} <code class="addr">{{ r.address }}</code>{% endif %}</h3>
-      {% if r.description %}<p>{{ r.description }}</p>{% endif %}
-      {% if r.fields %}
-      <table class="bits">
-        <thead><tr><th>Bits</th><th>Name</th><th>Access</th><th>Description</th></tr></thead>
-        <tbody>
-        {% for f in r.fields %}
-          <tr><td>{{ f.bits }}</td><td><code>{{ f.name }}</code></td><td>{{ f.access }}</td><td>{{ f.description }}</td></tr>
-        {% endfor %}
-        </tbody>
-      </table>
-      {% endif %}
-    </div>
-    {% endfor %}
+    {% for r in enrichment.registers %}{{ m.register_block(r) }}{% endfor %}
   </section>
   {% endif %}
 
   {% if enrichment.code_examples %}
   <section class="code-examples" id="code">
     <h2>Code examples {{ pl('code', 'Code examples') }}</h2>
-    {% for c in enrichment.code_examples %}
-    <figure class="code">
-      <figcaption>{{ c.title }} <span class="lang">{{ c.language }}</span></figcaption>
-      <pre><code class="lang-{{ c.language }}">{{ c.code }}</code></pre>
-    </figure>
-    {% endfor %}
+    {% for c in enrichment.code_examples %}{{ m.code_figure(c) }}{% endfor %}
   </section>
   {% endif %}
 

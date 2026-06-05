@@ -63,11 +63,7 @@
     }).join("");
   }
 
-  function escapeHtml(s) {
-    return (s || "").replace(/[&<>"]/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
-    });
-  }
+  var escapeHtml = window.DSW.esc;
 
   var params = new URLSearchParams(location.search);
   if (params.get("q")) { input.value = params.get("q"); }

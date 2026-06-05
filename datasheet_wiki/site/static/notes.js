@@ -1,7 +1,7 @@
 // Personal per-section notes, saved in localStorage (per datasheet). Powers the
 // "My notes" box on each section page and the aggregated notes.html page.
 (function () {
-  var PFX = "dsw:" + (window.DSW_ID || "datasheet") + ":note:";
+  var PFX = window.DSW.key("note:");
 
   function get(sec) { try { return localStorage.getItem(PFX + sec) || ""; } catch (e) { return ""; } }
   function set(sec, val) {
@@ -19,7 +19,7 @@
   }
   window.DSWNotes = { get: get, set: set, list: list };
 
-  function esc(s) { return (s || "").replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }); }
+  var esc = window.DSW.esc;
 
   // section-page editor
   var ta = document.getElementById("note");

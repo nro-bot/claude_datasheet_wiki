@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_macros.html" as m %}
 {% block title %}Code examples{% endblock %}
 {% block content %}
 <article class="prose">
@@ -17,12 +18,7 @@
   {% for g in code_groups %}
   <section class="code-group">
     <h2 id="{{ g.id }}"><a href="{{ root }}{{ g.url }}">{{ g.title }}</a></h2>
-    {% for c in g.examples %}
-    <figure class="code">
-      <figcaption>{{ c.title }} <span class="lang">{{ c.language }}</span></figcaption>
-      <pre><code class="lang-{{ c.language }}">{{ c.code }}</code></pre>
-    </figure>
-    {% endfor %}
+    {% for c in g.examples %}{{ m.code_figure(c) }}{% endfor %}
   </section>
   {% endfor %}
   {% else %}

@@ -54,11 +54,7 @@
     document.body.classList.remove("lb-open");
     bImg.src = "";
   }
-  function escapeHtml(s) {
-    return (s || "").replace(/[&<>"]/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
-    });
-  }
+  var escapeHtml = window.DSW.esc;
 
   items.forEach(function (it, i) {
     it.trigger.style.cursor = "zoom-in";

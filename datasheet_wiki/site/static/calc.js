@@ -82,11 +82,7 @@
   }
 
   function zero(n) { return new Array(n + 1).join("0"); }
-  function escapeHtml(s) {
-    return (s || "").replace(/[&<>"]/g, function (c) {
-      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
-    });
-  }
+  var escapeHtml = window.DSW.esc;
 
   function run() { document.querySelectorAll(".register").forEach(build); }
   if (document.readyState !== "loading") run();
