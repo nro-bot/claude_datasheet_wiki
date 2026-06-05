@@ -46,20 +46,45 @@ def _build(args: argparse.Namespace) -> int:
 def _serve(args: argparse.Namespace) -> int:
     import functools
     import http.server
-    import socketserver
+    import signal
 
     directory = Path(args.dir)
     if not (directory / "index.html").exists():
         log(f"ERROR: no index.html in {directory} — build it first.")
         return 2
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(directory))
-    with socketserver.TCPServer(("127.0.0.1", args.port), handler) as httpd:
-        log(f"Serving {directory} at http://127.0.0.1:{args.port}/  (Ctrl+C to stop)")
-        try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            log("Stopped.")
+
+    class Server(http.server.ThreadingHTTPServer):
+        # SO_REUSEADDR so the port is immediately re-bindable after we stop
+        # (no lingering TIME_WAIT); daemon threads so an in-flight request can
+        # never block Ctrl+C from exiting.
+        allow_reuse_address = True
+        daemon_threads = True
+
+    try:
+        httpd = Server(("127.0.0.1", args.port), handler)
+    except OSError as exc:
+        log(f"ERROR: cannot bind 127.0.0.1:{args.port} ({exc}). "
+            f"Is another server already using it? Try -p <other-port>.")
+        return 2
+
+    # Make SIGTERM behave like Ctrl+C (clean shutdown + port release).
+    signal.signal(signal.SIGTERM, lambda *_: _raise_keyboard_interrupt())
+
+    log(f"Serving {directory} at http://127.0.0.1:{args.port}/  (Ctrl+C to stop)")
+    try:
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        log("Stopping…")
+    finally:
+        httpd.shutdown()       # stop the serve loop
+        httpd.server_close()   # close the listening socket, freeing the port
+    log("Stopped; port freed.")
     return 0
+
+
+def _raise_keyboard_interrupt():
+    raise KeyboardInterrupt
 
 
 def _info(args: argparse.Namespace) -> int:
