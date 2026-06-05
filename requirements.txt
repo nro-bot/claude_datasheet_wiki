@@ -1,0 +1,5 @@
+# Core dependencies (the small / no-LLM tier). Optional tiers:
+#   medium (local LLM + semantic): pip install "datasheet-wiki[local]"  + Ollama
+#   large  (Claude API):           pip install "datasheet-wiki[api]"
+PyMuPDF>=1.23
+Jinja2>=3.1

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{{ section.title }}{% endblock %}
+{% block content %}
+<article class="prose section">
+  <nav class="crumbs">
+    {% for c in breadcrumbs %}
+      {% if not loop.last %}<a href="{{ root }}{{ c.url }}">{{ c.title }}</a> ›
+      {% else %}<span>{{ c.title }}</span>{% endif %}
+    {% endfor %}
+  </nav>
+
+  <h1>{% if section.number %}<span class="secnum">{{ section.number }}</span> {% endif %}{{ section.title }}</h1>
+  <p class="muted">Source: {{ section.page_label }}</p>
+
+  {% if enrichment.summary %}
+  <div class="summary">
+    <h2>Summary</h2>
+    <p>{{ enrichment.summary }}</p>
+    {% if enrichment.keywords %}
+    <p class="tags">{% for k in enrichment.keywords %}<span class="tag">{{ k }}</span>{% endfor %}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+
+  {% if enrichment.registers %}
+  <section class="registers">
+    <h2>Registers</h2>
+    {% for r in enrichment.registers %}
+    <div class="register">
+      <h3>{{ r.name }}{% if r.address %} <code class="addr">{{ r.address }}</code>{% endif %}</h3>
+      {% if r.description %}<p>{{ r.description }}</p>{% endif %}
+      {% if r.fields %}
+      <table class="bits">
+        <thead><tr><th>Bits</th><th>Name</th><th>Access</th><th>Description</th></tr></thead>
+        <tbody>
+        {% for f in r.fields %}
+          <tr><td>{{ f.bits }}</td><td><code>{{ f.name }}</code></td><td>{{ f.access }}</td><td>{{ f.description }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  {% if enrichment.code_examples %}
+  <section class="code-examples">
+    <h2>Code examples</h2>
+    {% for c in enrichment.code_examples %}
+    <figure class="code">
+      <figcaption>{{ c.title }} <span class="lang">{{ c.language }}</span></figcaption>
+      <pre><code class="lang-{{ c.language }}">{{ c.code }}</code></pre>
+    </figure>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <section class="bodytext">
+    <h2>Text</h2>
+    {{ body | safe }}
+  </section>
+
+  {% if images %}
+  <section class="pageimages">
+    <h2>Original pages</h2>
+    <div class="thumbs">
+      {% for img in images %}
+      <a class="thumb" href="{{ root }}images/{{ img }}" target="_blank" rel="noopener">
+        <img loading="lazy" src="{{ root }}images/{{ img }}" alt="Datasheet page">
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <nav class="prevnext">
+    {% if prev %}<a class="prev" href="{{ root }}{{ prev.url }}">← {{ prev.title }}</a>{% endif %}
+    {% if next %}<a class="next" href="{{ root }}{{ next.url }}">{{ next.title }} →</a>{% endif %}
+  </nav>
+</article>
+{% endblock %}

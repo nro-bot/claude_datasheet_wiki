@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "datasheet-wiki"
+version = "0.1.0"
+description = "Turn a microcontroller datasheet PDF into a searchable, hyperlinked, self-hosted wiki."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [{ name = "datasheet-wiki contributors" }]
+keywords = ["datasheet", "pdf", "microcontroller", "wiki", "embedded", "rp2040", "attiny"]
+
+# Required for the "small" (no-LLM, runs-anywhere) tier.
+dependencies = [
+    "PyMuPDF>=1.23",
+    "Jinja2>=3.1",
+]
+
+[project.optional-dependencies]
+# Local semantic search + local embeddings (used by the "medium" tier).
+local = [
+    "sentence-transformers>=2.2",
+    "numpy>=1.21",
+]
+# Cloud LLM API enrichment (used by the "large" tier).
+api = [
+    "anthropic>=0.39",
+]
+dev = [
+    "pytest>=7",
+]
+
+[project.scripts]
+datasheet-wiki = "datasheet_wiki.cli:main"
+dsw = "datasheet_wiki.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["datasheet_wiki*"]
+
+[tool.setuptools.package-data]
+datasheet_wiki = ["site/templates/*.html", "site/static/*"]

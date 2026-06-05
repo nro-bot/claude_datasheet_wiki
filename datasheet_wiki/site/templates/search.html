@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Search{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>Search</h1>
+  <input type="search" id="q" class="bigsearch" placeholder="Search registers, peripherals, pins…" autofocus>
+  <p id="search-status" class="muted"></p>
+  <div id="results" class="results"></div>
+</article>
+{% endblock %}
+{% block scripts %}
+<script src="{{ root }}data/search-index.js"></script>
+{% if meta.semantic %}<script src="{{ root }}data/vectors.js"></script>{% endif %}
+<script src="{{ root }}assets/search.js"></script>
+{% endblock %}

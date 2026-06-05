@@ -1,0 +1,31 @@
+# --- Datasheet content stays local (copyright) ---
+# Never commit datasheet PDFs or generated wikis. Each user processes their
+# own legally-obtained PDF on their own machine.
+*.pdf
+!docs/**/*.pdf
+wiki/
+wikis/
+out/
+output/
+site_output/
+.dsw-cache/
+*.dsw-cache/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+
+# --- Editors / OS ---
+.vscode/
+.idea/
+.DS_Store
+*.swp

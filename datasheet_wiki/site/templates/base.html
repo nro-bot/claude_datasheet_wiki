@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ meta.title }}{% endblock %} · datasheet-wiki</title>
+  <link rel="stylesheet" href="{{ root }}assets/style.css">
+</head>
+<body data-page="{{ page }}">
+<header class="topbar">
+  <button id="menu-toggle" aria-label="Toggle navigation">☰</button>
+  <a class="brand" href="{{ root }}index.html">{{ meta.title }}</a>
+  <form class="topsearch" action="{{ root }}search.html" method="get">
+    <input type="search" name="q" placeholder="Search…" aria-label="Search">
+  </form>
+</header>
+<div class="layout">
+  <nav id="sidebar" class="sidebar" aria-label="Datasheet sections">
+    <div class="sidebar-inner">
+      <a class="nav-home" href="{{ root }}index.html">Overview</a>
+      <a class="nav-home" href="{{ root }}search.html">Search</a>
+      <div id="nav-tree" class="nav-tree"></div>
+      <a class="nav-home about" href="{{ root }}about.html">About &amp; copyright</a>
+    </div>
+  </nav>
+  <main class="content">
+    {% block content %}{% endblock %}
+    <footer class="pagefoot">
+      <span>Generated {{ generated }} · {{ section_count }} sections · backend:
+      <code>{{ meta.backend }}</code> ({{ meta.compute }} tier)</span>
+    </footer>
+  </main>
+</div>
+<script>window.DSW_ROOT = "{{ root }}";</script>
+<script src="{{ root }}assets/nav.js"></script>
+<script src="{{ root }}assets/app.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

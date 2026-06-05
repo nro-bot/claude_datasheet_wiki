@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ meta.title }}{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>{{ meta.title }}</h1>
+  <p class="lead">A searchable, hyperlinked wiki generated from
+    <code>{{ meta.source_name }}</code> ({{ meta.page_count }} pages).</p>
+
+  <div class="stat-grid">
+    <div class="stat"><span class="num">{{ stats.sections }}</span><span class="lbl">sections</span></div>
+    <div class="stat"><span class="num">{{ stats.pages }}</span><span class="lbl">pages</span></div>
+    <div class="stat"><span class="num">{{ stats.registers }}</span><span class="lbl">registers</span></div>
+    <div class="stat"><span class="num">{{ stats.code }}</span><span class="lbl">code examples</span></div>
+  </div>
+
+  <p><a class="btn" href="search.html">Search the datasheet →</a></p>
+
+  <h2>Contents</h2>
+  <ul class="toc">
+    {% for s in top_sections %}
+    <li><a href="{{ s.url }}">{% if s.number %}<span class="secnum">{{ s.number }}</span> {% endif %}{{ s.title }}</a>
+      <span class="muted">{{ s.page }}</span></li>
+    {% endfor %}
+  </ul>
+</article>
+{% endblock %}

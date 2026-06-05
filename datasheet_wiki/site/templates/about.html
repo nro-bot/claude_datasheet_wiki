@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}About &amp; copyright{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>About this wiki</h1>
+  <p>This site was generated locally with
+    <a href="https://github.com/nro-bot/claude_datasheet_wiki">datasheet-wiki</a>
+    from <code>{{ meta.source_name }}</code>.</p>
+
+  <table class="kv">
+    <tr><th>Source document</th><td>{{ meta.source_name }}</td></tr>
+    <tr><th>Pages</th><td>{{ meta.page_count }}</td></tr>
+    <tr><th>Sections</th><td>{{ section_count }}</td></tr>
+    <tr><th>Compute tier</th><td>{{ meta.compute }}</td></tr>
+    <tr><th>Enrichment backend</th><td><code>{{ meta.backend }}</code>{% if meta.model %} ({{ meta.model }}){% endif %}</td></tr>
+    <tr><th>Render DPI</th><td>{{ meta.dpi }}</td></tr>
+    <tr><th>Generated</th><td>{{ generated }}</td></tr>
+  </table>
+
+  <h2>Copyright</h2>
+  <p>Datasheets are copyrighted by their manufacturers. This wiki is generated
+  from <em>your own</em> copy of the PDF and is intended for personal, local use.
+  The generated output (page images and extracted text) is deliberately kept out
+  of version control — the <code>datasheet-wiki</code> repository contains only
+  the generator code, never datasheet content. Do not redistribute the generated
+  site or the source PDF unless the manufacturer's license permits it.</p>
+
+  <h2>How it was made</h2>
+  <p>The generator extracts text, the table of contents, embedded cross-reference
+  hyperlinks, and a rendered image of every page using
+  <a href="https://pymupdf.readthedocs.io/">PyMuPDF</a>. Cross references such as
+  "see Section 4.3" and "page 42" are turned into wiki links automatically. The
+  <code>{{ meta.compute }}</code> tier
+  {% if meta.backend == 'none' %}used only local heuristics (no LLM).
+  {% elif meta.backend == 'ollama' %}used a local LLM via Ollama (no data left this machine).
+  {% else %}used the Claude API to summarise sections and extract registers/code.
+  {% endif %}</p>
+</article>
+{% endblock %}
