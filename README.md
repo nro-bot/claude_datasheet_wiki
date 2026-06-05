@@ -121,6 +121,14 @@ ollama pull llama3.1          # or qwen2.5, mistral, phi3 …
 uv run datasheet-wiki build rp2040.pdf --compute medium --model llama3.1
 ```
 
+GPU acceleration is handled by **Ollama itself**, not this tool — it uses Metal
+(MPS) on Apple Silicon, CUDA on NVIDIA, or ROCm on AMD automatically, with no
+configuration. This tool is just an HTTP client to the local Ollama server, so it
+never changes the inference backend. To confirm the GPU is being used while a
+build runs, check `ollama ps` (it shows e.g. `100% GPU`) or the `ollama serve`
+logs. To tune offloading, set Ollama's own env vars (e.g. `OLLAMA_NUM_GPU`)
+before `ollama serve`.
+
 ### Large tier (Claude API)
 
 ```bash
