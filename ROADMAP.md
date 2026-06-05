@@ -27,7 +27,7 @@ Status legend: ✅ done · 🚧 in progress · ⬜ planned
 - ⬜ **Import an existing SVD** for authoritative register data.
 
 ## Search & navigation
-- ⬜ **Ctrl-K command palette** (jump to section/register/pin).
+- ✅ **Ctrl-K command palette** (jump to section/register/pin).
 - ⬜ **Ask-the-datasheet Q&A (RAG)** using the medium/large tier's local embeddings.
 - ⬜ **Acronym/glossary tooltips**.
 

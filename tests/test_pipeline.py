@@ -89,6 +89,23 @@ def test_page_manifest(wiki: Path):
     assert '"n":1' in js
 
 
+def test_command_palette(wiki: Path):
+    data = (wiki / "assets" / "palette-data.js").read_text()
+    assert data.startswith("window.DSW_PALETTE=")
+    assert '"k":"section"' in data and '"k":"register"' in data
+    assert "DDRB" in data  # a register is jump-able
+    index = (wiki / "index.html").read_text()
+    assert "assets/palette.js" in index and 'id="cmdk"' in index
+
+
+def test_register_export_files(wiki: Path):
+    assert (wiki / "device.h").exists()
+    h = (wiki / "device.h").read_text()
+    assert "#define DDRB_DDB7_Pos" in h
+    reg = (wiki / "registers.html").read_text()
+    assert 'href="device.h" download' in reg
+
+
 def test_register_map_page(wiki: Path):
     reg = (wiki / "registers.html").read_text()
     assert "Register map" in reg

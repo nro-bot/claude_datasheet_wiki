@@ -92,6 +92,23 @@ class SiteBuilder:
             encoding="utf-8",
         )
 
+        # quick-jump palette index (sections + registers + key pages)
+        palette = []
+        for s in sections:
+            label = (f"{s.number} " if s.number else "") + s.short_title
+            palette.append({"t": label, "u": s.url, "k": "section"})
+        for sec in sections:
+            for r in (enrichments.get(sec.id) or Enrichment()).registers:
+                palette.append({"t": r.name, "u": f"{sec.url}#registers", "k": "register", "s": sec.short_title})
+        for label, url in [("Register map", "registers.html"), ("Code examples", "code.html"),
+                           ("Reference builder", "reference.html"), ("Personal Reference", "starred.html"),
+                           ("Search", "search.html"), ("How it's generated", "how.html")]:
+            palette.append({"t": label, "u": url, "k": "page"})
+        (self.out / "assets" / "palette-data.js").write_text(
+            "window.DSW_PALETTE=" + json.dumps(palette, ensure_ascii=False, separators=(",", ":")) + ";\n",
+            encoding="utf-8",
+        )
+
         common = {
             "meta": self.meta,
             "nav": nav,

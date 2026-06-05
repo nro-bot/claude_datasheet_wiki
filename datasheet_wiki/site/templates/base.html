@@ -23,6 +23,7 @@
 <header class="topbar">
   <button id="menu-toggle" aria-label="Toggle navigation">☰</button>
   <a class="brand" href="{{ root }}index.html">{{ meta.title }}</a>
+  <button id="cmdk" class="cmdk-btn" type="button" title="Quick jump (Ctrl/⌘ K)" aria-label="Quick jump">⌘K</button>
   <form class="topsearch" action="{{ root }}search.html" method="get">
     <input type="search" name="q" placeholder="Search…" aria-label="Search">
   </form>
@@ -50,6 +51,8 @@
   </main>
 </div>
 <script>window.DSW_ROOT = "{{ root }}"; window.DSW_ID = {{ wiki_id | tojson }};</script>
+<script src="{{ root }}assets/palette-data.js"></script>
+<script src="{{ root }}assets/palette.js"></script>
 <script src="{{ root }}assets/app.js"></script>
 <script src="{{ root }}assets/bookmarks.js"></script>
 <script src="{{ root }}assets/calc.js"></script>
