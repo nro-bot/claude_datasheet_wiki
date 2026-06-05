@@ -15,4 +15,4 @@ def test_llm_fallback_tagged_none_not_backend_name():
     be = get_backend("ollama", model="llama3.1", ollama_host="http://127.0.0.1:1")
     enr = be.enrich("Timers", "The 8-bit timer supports PWM.")
     assert enr.backend == "none"
-    assert enr.summary  # heuristic summary still produced
+    assert enr.keywords  # heuristic baseline still ran
