@@ -1,85 +1,86 @@
-// Minimal, dependency-free image lightbox. Progressive enhancement: page-image
-// links still open the image directly when JS is off; with JS they open here.
+// Dependency-free image lightbox with left/right navigation.
+// Exposes window.DSWLightbox.open(items, index) where items = [{src, caption}],
+// reused by the reference/starred galleries. Also auto-wires static source-page
+// thumbnails and inline figures on the current page (progressive enhancement —
+// the links still open the image directly with JS off).
 (function () {
-  // Collect viewable images in document order: source-page thumbnails (links to
-  // the full image) and inline figures.
-  var items = [];
-  document.querySelectorAll(".thumb a").forEach(function (a) {
-    var img = a.querySelector("img");
-    var cap = a.parentElement.querySelector("figcaption");
-    items.push({
-      trigger: a,
-      src: a.getAttribute("href"),
-      caption: cap ? cap.textContent.trim() : (img ? img.alt : ""),
+  var esc = window.DSW.esc;
+  var box, bImg, bCap, bPrev, bNext, items = [], idx = -1;
+
+  function buildBox() {
+    box = document.createElement("div");
+    box.className = "lightbox";
+    box.setAttribute("hidden", "");
+    box.innerHTML =
+      '<button class="lb-close" aria-label="Close (Esc)">×</button>' +
+      '<button class="lb-nav lb-prev" aria-label="Previous (←)">‹</button>' +
+      '<button class="lb-nav lb-next" aria-label="Next (→)">›</button>' +
+      '<figure class="lb-stage"><img alt=""><figcaption></figcaption></figure>';
+    document.body.appendChild(box);
+    bImg = box.querySelector("img");
+    bCap = box.querySelector("figcaption");
+    bPrev = box.querySelector(".lb-prev");
+    bNext = box.querySelector(".lb-next");
+    bPrev.addEventListener("click", function (e) { e.stopPropagation(); show(idx - 1); });
+    bNext.addEventListener("click", function (e) { e.stopPropagation(); show(idx + 1); });
+    box.querySelector(".lb-close").addEventListener("click", close);
+    box.addEventListener("click", function (e) {
+      if (e.target === box || e.target.classList.contains("lb-stage")) close();
     });
-  });
-  document.querySelectorAll("figure.dsfig img").forEach(function (img) {
-    items.push({ trigger: img, src: img.getAttribute("src"), caption: img.alt || "Figure" });
-  });
-  if (!items.length) return;
-
-  // Build the overlay once.
-  var box = document.createElement("div");
-  box.className = "lightbox";
-  box.setAttribute("hidden", "");
-  box.innerHTML =
-    '<button class="lb-close" aria-label="Close (Esc)">×</button>' +
-    '<button class="lb-nav lb-prev" aria-label="Previous">‹</button>' +
-    '<button class="lb-nav lb-next" aria-label="Next">›</button>' +
-    '<figure class="lb-stage"><img alt=""><figcaption></figcaption></figure>';
-  document.body.appendChild(box);
-
-  var bImg = box.querySelector("img");
-  var bCap = box.querySelector("figcaption");
-  var idx = -1;
+    bImg.addEventListener("click", function () { if (items.length > 1) show(idx + 1); });
+    document.addEventListener("keydown", function (e) {
+      if (!box || box.hasAttribute("hidden")) return;
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowLeft") show(idx - 1);
+      else if (e.key === "ArrowRight") show(idx + 1);
+    });
+  }
 
   function show(i) {
     idx = (i + items.length) % items.length;
     var it = items[idx];
     bImg.src = it.src;
-    bImg.alt = it.caption;
-    var more = items.length > 1 ? " (" + (idx + 1) + "/" + items.length + ")" : "";
+    bImg.alt = it.caption || "";
+    var multi = items.length > 1;
+    bPrev.style.display = bNext.style.display = multi ? "" : "none";
     bCap.innerHTML =
-      escapeHtml(it.caption) + more +
+      esc(it.caption || "") + (multi ? " (" + (idx + 1) + "/" + items.length + ")" : "") +
       ' · <a href="' + encodeURI(it.src) + '" target="_blank" rel="noopener">open original ↗</a>';
   }
 
-  function open(i) {
-    show(i);
+  function open(list, start) {
+    if (!list || !list.length) return;
+    if (!box) buildBox();
+    items = list;
+    show(start || 0);
     box.removeAttribute("hidden");
     document.body.classList.add("lb-open");
   }
   function close() {
-    box.setAttribute("hidden", "");
+    if (box) { box.setAttribute("hidden", ""); bImg.src = ""; }
     document.body.classList.remove("lb-open");
-    bImg.src = "";
   }
-  var escapeHtml = window.DSW.esc;
 
-  items.forEach(function (it, i) {
-    it.trigger.style.cursor = "zoom-in";
-    it.trigger.addEventListener("click", function (e) {
-      e.preventDefault();
-      open(i);
+  window.DSWLightbox = { open: open };
+
+  // Auto-wire whatever static thumbnails/figures exist on this page.
+  function autowire() {
+    var list = [], triggers = [];
+    document.querySelectorAll(".thumb a").forEach(function (a) {
+      var fig = a.closest(".thumb");
+      var cap = fig ? fig.querySelector("figcaption") : null;
+      list.push({ src: a.getAttribute("href"), caption: cap ? cap.textContent.trim() : a.querySelector("img") ? a.querySelector("img").alt : "" });
+      triggers.push(a);
     });
-  });
-
-  if (items.length < 2) {
-    box.querySelectorAll(".lb-nav").forEach(function (b) { b.style.display = "none"; });
+    document.querySelectorAll("figure.dsfig img").forEach(function (img) {
+      list.push({ src: img.getAttribute("src"), caption: img.alt || "Figure" });
+      triggers.push(img);
+    });
+    triggers.forEach(function (t, i) {
+      t.style.cursor = "zoom-in";
+      t.addEventListener("click", function (e) { e.preventDefault(); open(list, i); });
+    });
   }
-  box.querySelector(".lb-close").addEventListener("click", close);
-  box.querySelector(".lb-prev").addEventListener("click", function (e) { e.stopPropagation(); show(idx - 1); });
-  box.querySelector(".lb-next").addEventListener("click", function (e) { e.stopPropagation(); show(idx + 1); });
-  // click on the backdrop (not the image/controls) closes
-  box.addEventListener("click", function (e) {
-    if (e.target === box || e.target.classList.contains("lb-stage")) close();
-  });
-  bImg.addEventListener("click", function () { if (items.length > 1) show(idx + 1); });
-
-  document.addEventListener("keydown", function (e) {
-    if (box.hasAttribute("hidden")) return;
-    if (e.key === "Escape") close();
-    else if (e.key === "ArrowLeft") show(idx - 1);
-    else if (e.key === "ArrowRight") show(idx + 1);
-  });
+  if (document.readyState !== "loading") autowire();
+  else document.addEventListener("DOMContentLoaded", autowire);
 })();

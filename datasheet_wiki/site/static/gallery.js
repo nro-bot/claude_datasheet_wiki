@@ -17,23 +17,39 @@
 
   var escapeHtml = window.DSW.esc;
 
-  function figureHTML(n) {
-    var p = byNum[n];
-    var caption = "Page " + n + (p && p.sec ? " · " + escapeHtml(p.sec) : "");
-    var inner = (p && p.img)
-      ? '<a href="' + p.img + '" target="_blank" rel="noopener"><img loading="lazy" src="' + p.img + '" alt="Page ' + n + '"></a>'
-      : '<div class="noimg">Page ' + n + (p ? "" : " — out of range") + '<br><span>no image</span></div>';
-    var cap = (p && p.url) ? '<a href="' + p.url + '">' + caption + "</a>" : caption;
-    return '<figure class="thumb" data-page="' + n + '">' + inner + "<figcaption>" + cap + "</figcaption></figure>";
-  }
+  var currentItems = []; // lightbox items for the current gallery, index-aligned
 
   function renderGallery(container, nums) {
+    currentItems = [];
     if (!nums.length) {
       container.innerHTML = '<p class="muted empty">No pages yet.</p>';
       return;
     }
-    container.innerHTML = nums.map(figureHTML).join("");
+    container.innerHTML = nums.map(function (n) {
+      var p = byNum[n];
+      var capText = "Page " + n + (p && p.sec ? " · " + escapeHtml(p.sec) : "");
+      var cap = (p && p.url) ? '<a href="' + p.url + '">' + capText + "</a>" : capText;
+      var inner;
+      if (p && p.img) {
+        var i = currentItems.length;
+        currentItems.push({ src: p.img, caption: "Page " + n + (p && p.sec ? " · " + p.sec : "") });
+        inner = '<a class="shot" href="' + p.img + '" data-idx="' + i + '"><img loading="lazy" src="' + p.img + '" alt="Page ' + n + '"></a>';
+      } else {
+        inner = '<div class="noimg">Page ' + n + (p ? "" : " — out of range") + "<br><span>no image</span></div>";
+      }
+      return '<figure class="thumb tile" data-page="' + n + '">' + inner + "<figcaption>" + cap + "</figcaption></figure>";
+    }).join("");
     if (stars) stars.decorate();
+  }
+
+  // open the lightbox (with left/right nav) when a tile image is clicked
+  function wireLightbox(container) {
+    container.addEventListener("click", function (e) {
+      var a = e.target.closest(".shot");
+      if (!a) return;
+      e.preventDefault();
+      if (window.DSWLightbox) window.DSWLightbox.open(currentItems, +a.getAttribute("data-idx"));
+    });
   }
 
   function sizeSlider(container, onChange) {
@@ -75,6 +91,7 @@
     var controls = document.getElementById("controls");
     if (!gallery) return;
     controls.appendChild(sizeSlider(gallery));
+    wireLightbox(gallery);
 
     function refresh() {
       var nums = stars ? stars.list() : [];
@@ -100,6 +117,7 @@
     var results = document.getElementById("search-results");
     if (!input) return;
     controls.appendChild(sizeSlider(gallery));
+    wireLightbox(gallery);
 
     function update() {
       var nums = parseSpec(input.value);

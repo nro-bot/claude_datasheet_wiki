@@ -30,7 +30,7 @@
 
   {% for g in reg_groups %}
   <section class="reg-group" id="{{ g.id }}">
-    <h2>{% if g.url %}<a href="{{ root }}{{ g.url }}#registers">{% if g.number %}{{ g.number }} {% endif %}{{ g.title }}</a>{% else %}{{ g.title }}{% endif %}</h2>
+    <h2>{% if g.url %}<a href="{{ root }}{{ g.url }}">{% if g.number %}{{ g.number }} {% endif %}{{ g.title }}</a>{% else %}{{ g.title }}{% endif %}</h2>
     {% for r in g.registers %}{{ m.register_block(r) }}{% endfor %}
   </section>
   {% endfor %}

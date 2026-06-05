@@ -216,9 +216,13 @@ body.lb-open { overflow: hidden; }
 .gallery-controls { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 16px 0 4px; }
 .size-ctl { margin-left: auto; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
 .size-ctl input[type="range"] { vertical-align: middle; }
-.ref-gallery { display: grid; gap: 14px; margin-top: 14px;
-  grid-template-columns: repeat(auto-fill, minmax(var(--thumb-w, 220px), 1fr)); }
+/* fixed-size tiles (Finder-style); the size slider sets --thumb-w directly */
+.ref-gallery { display: grid; gap: 16px; margin-top: 14px; justify-content: center;
+  grid-template-columns: repeat(auto-fill, var(--thumb-w, 200px)); }
 .ref-gallery .empty { padding: 18px 0; }
+.ref-gallery .thumb.tile { width: var(--thumb-w, 200px); }
+.ref-gallery .thumb .shot { display: block; background: #fff; cursor: zoom-in; }
+.ref-gallery .thumb .shot img { width: 100%; height: auto; display: block; }
 .ref-gallery .noimg { aspect-ratio: 3 / 4; background: var(--panel); border: 1px dashed var(--border);
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   color: var(--muted); font-size: 13px; text-align: center; padding: 8px; }

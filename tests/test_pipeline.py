@@ -148,6 +148,15 @@ def test_register_map_page(wiki: Path):
     assert "Register map" in reg
     assert "DDRB" in reg and 'table class="bits"' in reg
     assert "registers.html" in (wiki / "index.html").read_text()  # nav link
+    # register-map headings link to the section page, not a sub-section anchor
+    assert 'href="sections/3-timer-counter.html"' in reg
+    assert "#registers" not in reg
+
+
+def test_gallery_lightbox_wiring(wiki: Path):
+    gjs = (wiki / "assets" / "gallery.js").read_text()
+    assert "DSWLightbox.open" in gjs and 'class="shot"' in gjs  # tiles open the lightbox
+    assert "window.DSWLightbox" in (wiki / "assets" / "lightbox.js").read_text()
 
 
 def test_reference_and_starred_pages(wiki: Path):
