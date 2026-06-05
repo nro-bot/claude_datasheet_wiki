@@ -117,6 +117,7 @@ class SiteBuilder:
                 code_groups=code_groups, code_count=total_code, **common,
             ),
         )
+        self._write("how.html", self.env.get_template("how.html").render(root="", page="how", current_url="", **common))
         self._write("about.html", self.env.get_template("about.html").render(root="", page="about", current_url="", **common))
 
         # section pages

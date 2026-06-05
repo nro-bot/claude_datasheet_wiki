@@ -10,16 +10,38 @@
   </nav>
 
   <h1>{% if section.number %}<span class="secnum">{{ section.number }}</span> {% endif %}{{ section.title }}</h1>
-  <p class="muted">Source: {{ section.page_label }}</p>
+  <p class="muted">Datasheet {{ section.page_label }}
+    {%- if meta.backend == 'none' %} · summary &amp; structure from local heuristics
+    {%- elif meta.backend == 'ollama' %} · enriched by a local LLM ({{ meta.model or 'ollama' }})
+    {%- else %} · enriched by {{ meta.backend }}{% if meta.model %} ({{ meta.model }}){% endif %}{% endif -%}
+    · <a href="{{ root }}how.html">how is this generated?</a></p>
 
   {% if enrichment.summary %}
   <div class="summary">
-    <h2>Summary</h2>
+    <h2>Summary <span class="from">generated from {{ section.page_label }}</span></h2>
     <p>{{ enrichment.summary }}</p>
     {% if enrichment.keywords %}
     <p class="tags">{% for k in enrichment.keywords %}<span class="tag">{{ k }}</span>{% endfor %}</p>
     {% endif %}
   </div>
+  {% endif %}
+
+  {% set page_imgs = images | select | list %}
+  {% if page_imgs %}
+  <section class="pageimages">
+    <h2>Source pages <span class="from">{{ section.page_label }}</span></h2>
+    <p class="muted">Everything on this page is generated from these original datasheet page{{ '' if page_imgs|length == 1 else 's' }}.</p>
+    <div class="thumbs">
+      {% for img in page_imgs %}
+      <figure class="thumb">
+        <a href="{{ root }}images/{{ img }}" target="_blank" rel="noopener">
+          <img loading="lazy" src="{{ root }}images/{{ img }}" alt="Datasheet page {{ section.start_page + loop.index0 + 1 }}">
+        </a>
+        <figcaption>Page {{ section.start_page + loop.index0 + 1 }}</figcaption>
+      </figure>
+      {% endfor %}
+    </div>
+  </section>
   {% endif %}
 
   {% if enrichment.registers %}
@@ -69,19 +91,6 @@
       {{ body | safe }}
     </div>
   </details>
-
-  {% if images %}
-  <section class="pageimages">
-    <h2>Original pages</h2>
-    <div class="thumbs">
-      {% for img in images %}
-      <a class="thumb" href="{{ root }}images/{{ img }}" target="_blank" rel="noopener">
-        <img loading="lazy" src="{{ root }}images/{{ img }}" alt="Datasheet page">
-      </a>
-      {% endfor %}
-    </div>
-  </section>
-  {% endif %}
 
   <nav class="prevnext">
     {% if prev %}<a class="prev" href="{{ root }}{{ prev.url }}">← {{ prev.title }}</a>{% endif %}

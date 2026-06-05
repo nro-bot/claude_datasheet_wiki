@@ -87,6 +87,11 @@ table.bits, table.kv { width: 100%; border-collapse: collapse; margin: 8px 0; fo
 table.bits th, table.bits td, table.kv th, table.kv td { border: 1px solid var(--border); padding: 6px 10px; text-align: left; vertical-align: top; }
 table.bits th, table.kv th { background: var(--panel2); }
 table.kv th { width: 200px; }
+table.kv.how th { width: 210px; vertical-align: top; }
+table.kv.how td { line-height: 1.55; }
+.how-tier { display: inline-block; margin-top: 8px; font-size: 11px; color: var(--muted);
+  background: var(--panel2); border: 1px solid var(--border); border-radius: 10px; padding: 1px 9px;
+  text-transform: uppercase; letter-spacing: .03em; }
 
 /* code */
 figure.code { margin: 14px 0; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
@@ -136,9 +141,13 @@ details.rawtext .bodytext { margin-top: 12px; }
 details.rawtext .bodytext p { color: var(--muted); }
 
 /* page images */
-.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
-.thumb { display: block; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: #fff; }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+.thumb { margin: 0; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; background: var(--panel); }
+.thumb a { display: block; background: #fff; }
 .thumb img { width: 100%; display: block; }
+.thumb figcaption { padding: 5px 6px; font-size: 12px; color: var(--muted); text-align: center;
+  border-top: 1px solid var(--border); }
+.from { font-size: 12px; color: var(--muted); font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 8px; }
 
 .prevnext { display: flex; justify-content: space-between; margin-top: 40px; gap: 10px; }
 .prevnext a { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; max-width: 48%; }

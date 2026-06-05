@@ -47,6 +47,22 @@ def test_code_detection(wiki: Path):
     assert "avr/io.h" in timer
 
 
+def test_section_layout_and_provenance(wiki: Path):
+    html = (wiki / "sections" / "3-timer-counter.html").read_text()
+    # source page images moved up: after summary, before the formatted text
+    assert html.index('class="summary"') < html.index('class="pageimages"') < html.index('class="formatted"')
+    # it is clear which pages the summary/section comes from
+    assert "generated from p.4" in html
+    assert "Page 4" in html  # captioned page image
+
+
+def test_how_page(wiki: Path):
+    how = (wiki / "how.html").read_text()
+    assert "How this wiki is generated" in how
+    assert "Cross-reference links" in how and "Registers" in how
+    assert "120 DPI" in how  # the small tier's render DPI
+
+
 def test_code_toc_page(wiki: Path):
     code = (wiki / "code.html").read_text()
     assert "Code examples" in code
