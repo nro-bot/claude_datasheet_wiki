@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Code examples{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>Code examples</h1>
+  {% if code_groups %}
+  <p class="lead">{{ code_count }} example{{ '' if code_count == 1 else 's' }}
+    across {{ code_groups|length }} section{{ '' if code_groups|length == 1 else 's' }}.</p>
+
+  <ul class="toc code-toc">
+    {% for g in code_groups %}
+    <li><a href="{{ root }}{{ g.url }}#code">{{ g.title }}</a>
+      <span class="muted">{{ g.examples|length }}×</span></li>
+    {% endfor %}
+  </ul>
+
+  {% for g in code_groups %}
+  <section class="code-group">
+    <h2 id="{{ g.id }}"><a href="{{ root }}{{ g.url }}">{{ g.title }}</a></h2>
+    {% for c in g.examples %}
+    <figure class="code">
+      <figcaption>{{ c.title }} <span class="lang">{{ c.language }}</span></figcaption>
+      <pre><code class="lang-{{ c.language }}">{{ c.code }}</code></pre>
+    </figure>
+    {% endfor %}
+  </section>
+  {% endfor %}
+  {% else %}
+  <p class="muted">No code examples were detected in this datasheet. The
+  heuristic (small) tier only finds code already printed in the PDF; the medium
+  and large tiers can also generate usage examples.</p>
+  {% endif %}
+</article>
+{% endblock %}

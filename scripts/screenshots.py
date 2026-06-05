@@ -61,3 +61,5 @@ if __name__ == "__main__":
     shot(wiki / "index.html", outdir / "overview.jpg")
     shot(wiki / "sections" / "3-timer-counter.html", outdir / "section-registers-code.jpg")
     shot(wiki / "sections" / "2-pin-configuration.html", outdir / "section-pinconfig.jpg")
+    if (wiki / "code.html").exists():
+        shot(wiki / "code.html", outdir / "code-examples.jpg")

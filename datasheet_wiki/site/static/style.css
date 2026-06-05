@@ -65,6 +65,10 @@ code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, m
 .btn { display: inline-block; background: var(--accent); color: #04121d; font-weight: 600;
   padding: 9px 16px; border-radius: 8px; }
 .btn:hover { text-decoration: none; filter: brightness(1.08); }
+.btn-ghost { background: var(--panel); color: var(--link); border: 1px solid var(--border); margin-left: 8px; }
+.code-group { margin-top: 28px; }
+.code-group h2 a { color: var(--text); }
+.code-toc li .muted { font-variant-numeric: tabular-nums; }
 .toc { list-style: none; padding: 0; }
 .toc li { display: flex; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--border); }
 

@@ -103,6 +103,20 @@ class SiteBuilder:
             ),
         )
         self._write("search.html", self.env.get_template("search.html").render(root="", page="search", current_url="", **common))
+
+        # code-examples table of contents
+        code_groups = []
+        for sec in sections:
+            ex = (enrichments.get(sec.id) or Enrichment()).code_examples
+            if ex:
+                code_groups.append({"id": sec.id, "title": sec.title, "url": sec.url, "examples": ex})
+        self._write(
+            "code.html",
+            self.env.get_template("code.html").render(
+                root="", page="code", current_url="",
+                code_groups=code_groups, code_count=total_code, **common,
+            ),
+        )
         self._write("about.html", self.env.get_template("about.html").render(root="", page="about", current_url="", **common))
 
         # section pages

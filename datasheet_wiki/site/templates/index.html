@@ -13,7 +13,8 @@
     <div class="stat"><span class="num">{{ stats.code }}</span><span class="lbl">code examples</span></div>
   </div>
 
-  <p><a class="btn" href="search.html">Search the datasheet →</a></p>
+  <p><a class="btn" href="search.html">Search the datasheet →</a>
+     {% if stats.code %}<a class="btn btn-ghost" href="code.html">Browse {{ stats.code }} code example{{ '' if stats.code == 1 else 's' }} →</a>{% endif %}</p>
 
   <h2>Contents</h2>
   <ul class="toc">

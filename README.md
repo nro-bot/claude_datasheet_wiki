@@ -34,6 +34,11 @@ A section page: server-rendered section tree (highlighting the current page), an
 auto-generated summary with keyword tags, a detected register bit-field table,
 a code example, the cleaned-up text, and an image of the original PDF page.
 
+There's also a **Code examples** page (`code.html`) that collects every detected
+code example across the whole datasheet into one browsable, linked index:
+
+![Code examples index](docs/screenshots/code-examples.jpg)
+
 ---
 
 ## Why

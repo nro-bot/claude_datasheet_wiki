@@ -47,6 +47,14 @@ def test_code_detection(wiki: Path):
     assert "avr/io.h" in timer
 
 
+def test_code_toc_page(wiki: Path):
+    code = (wiki / "code.html").read_text()
+    assert "Code examples" in code
+    # lists the timer section and shows its code, linked back to the section
+    assert "3-timer-counter.html" in code
+    assert "avr/io.h" in code
+
+
 def test_search_index_has_terms(wiki: Path):
     js = (wiki / "data" / "search-index.js").read_text()
     assert js.startswith("window.DSW_SEARCH = ")
