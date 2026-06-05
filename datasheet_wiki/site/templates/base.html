@@ -17,6 +17,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ meta.title }}{% endblock %} · datasheet-wiki</title>
+  <meta name="theme-color" content="#0f1115">
+  <link rel="manifest" href="{{ root }}manifest.webmanifest">
   <link rel="stylesheet" href="{{ root }}assets/style.css">
 </head>
 <body data-page="{{ page }}">
@@ -52,7 +54,8 @@
     </footer>
   </main>
 </div>
-<script>window.DSW_ROOT = "{{ root }}"; window.DSW_ID = {{ wiki_id | tojson }};</script>
+<script>window.DSW_ROOT = "{{ root }}"; window.DSW_ID = {{ wiki_id | tojson }};
+if ("serviceWorker" in navigator) { window.addEventListener("load", function () { navigator.serviceWorker.register(window.DSW_ROOT + "sw.js").catch(function () {}); }); }</script>
 <script src="{{ root }}assets/util.js"></script>
 <script src="{{ root }}assets/palette-data.js"></script>
 <script src="{{ root }}assets/palette.js"></script>

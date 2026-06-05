@@ -89,6 +89,16 @@ class SiteBuilder:
             encoding="utf-8",
         )
 
+        # PWA: web manifest + a service worker (must sit at the site root so its
+        # scope covers every page) for installable, fully-offline use.
+        title = self.meta.get("title") or "Datasheet"
+        (self.out / "manifest.webmanifest").write_text(json.dumps({
+            "name": title, "short_name": title[:24], "start_url": "./index.html",
+            "display": "standalone", "background_color": "#0f1115", "theme_color": "#0f1115",
+        }, ensure_ascii=False, indent=2), encoding="utf-8")
+        (self.out / "sw.js").write_text((STATIC / "sw.js").read_text(encoding="utf-8"), encoding="utf-8")
+        (self.out / "assets" / "sw.js").unlink(missing_ok=True)  # only the root copy is used
+
         # quick-jump palette index (sections + registers + key pages)
         palette = []
         for s in sections:

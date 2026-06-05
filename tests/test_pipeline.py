@@ -89,6 +89,16 @@ def test_page_manifest(wiki: Path):
     assert '"n":1' in js
 
 
+def test_pwa_offline(wiki: Path):
+    import json
+    assert (wiki / "sw.js").exists()                 # service worker at the root
+    assert not (wiki / "assets" / "sw.js").exists()  # not the dead assets copy
+    man = json.loads((wiki / "manifest.webmanifest").read_text())
+    assert man["display"] == "standalone" and man["start_url"] == "./index.html"
+    index = (wiki / "index.html").read_text()
+    assert 'rel="manifest"' in index and "serviceWorker.register" in index
+
+
 def test_provenance_badges(wiki: Path):
     html = (wiki / "sections" / "3-timer-counter.html").read_text()
     # small tier -> heuristic badge on summary, registers and code headings
