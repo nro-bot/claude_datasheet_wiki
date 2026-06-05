@@ -9,6 +9,7 @@ page-group sections so the tool still produces a usable wiki.
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
 
@@ -35,6 +36,16 @@ class Section:
     @property
     def url(self) -> str:
         return f"sections/{self.id}.html"
+
+    @property
+    def short_title(self) -> str:
+        """Title with the leading section number removed (it's shown separately,
+        so this avoids "6 6. GPIO")."""
+        t = self.title.strip()
+        if self.number:
+            stripped = re.sub(r"^" + re.escape(self.number) + r"\.?(?:\s+|$)", "", t)
+            return stripped or t
+        return t
 
     @property
     def page_label(self) -> str:

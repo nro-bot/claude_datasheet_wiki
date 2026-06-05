@@ -54,6 +54,26 @@ def test_section_layout_and_provenance(wiki: Path):
     # it is clear which pages the summary/section comes from
     assert "generated from p.4" in html
     assert "Page 4" in html  # captioned page image
+    # compact in-page ToC under the summary
+    assert 'class="section-toc"' in html
+    for label in ("Source Pages", "Formatted Text", "Raw Text"):
+        assert label in html
+    for anchor in ('id="source"', 'id="formatted"', 'id="rawtext"'):
+        assert anchor in html
+    # per-page provenance blurb removed
+    assert "how is this generated?" not in html
+    assert "Everything on this page" not in html
+
+
+def test_section_number_not_duplicated(wiki: Path):
+    html = (wiki / "sections" / "3-timer-counter.html").read_text()
+    # heading shows the number once: "3" (secnum) + "Timer/Counter", not "3 3 …"
+    assert '<span class="secnum">3</span> Timer/Counter</h1>' in html
+    assert "3 3 Timer" not in html
+    # ...and the same in the sidebar nav / overview TOC
+    index = (wiki / "index.html").read_text()
+    assert '<span class="secnum">2</span> Pin Configuration' in index
+    assert "2 2 Pin Configuration" not in index
 
 
 def test_lightbox_wired(wiki: Path):

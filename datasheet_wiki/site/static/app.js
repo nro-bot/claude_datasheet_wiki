@@ -44,4 +44,17 @@
       document.body.classList.toggle("nav-open");
     });
   }
+
+  // Open a collapsed <details> (e.g. Raw Text) when its anchor is navigated to.
+  function openTargetDetails() {
+    var h = location.hash;
+    if (!h || h.length < 2) return;
+    var el;
+    try { el = document.querySelector(h); } catch (e) { return; }
+    if (!el) return;
+    var det = el.tagName === "DETAILS" ? el : (el.closest && el.closest("details"));
+    if (det) det.open = true;
+  }
+  window.addEventListener("hashchange", openTargetDetails);
+  openTargetDetails();
 })();

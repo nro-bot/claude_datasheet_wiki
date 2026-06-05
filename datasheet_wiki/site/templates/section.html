@@ -9,12 +9,8 @@
     {% endfor %}
   </nav>
 
-  <h1>{% if section.number %}<span class="secnum">{{ section.number }}</span> {% endif %}{{ section.title }}</h1>
-  <p class="muted">Datasheet {{ section.page_label }}
-    {%- if meta.backend == 'none' %} · summary &amp; structure from local heuristics
-    {%- elif meta.backend == 'ollama' %} · enriched by a local LLM ({{ meta.model or 'ollama' }})
-    {%- else %} · enriched by {{ meta.backend }}{% if meta.model %} ({{ meta.model }}){% endif %}{% endif -%}
-    · <a href="{{ root }}how.html">how is this generated?</a></p>
+  <h1>{% if section.number %}<span class="secnum">{{ section.number }}</span> {% endif %}{{ section.short_title }}</h1>
+  <p class="muted">Datasheet {{ section.page_label }}</p>
 
   {% if enrichment.summary %}
   <div class="summary">
@@ -27,10 +23,16 @@
   {% endif %}
 
   {% set page_imgs = images | select | list %}
+
+  <nav class="section-toc" aria-label="On this page">
+    {% if page_imgs %}<a href="#source">Source Pages</a>{% endif %}
+    {% if formatted %}<a href="#formatted">Formatted Text</a>{% endif %}
+    <a href="#rawtext">Raw Text</a>
+  </nav>
+
   {% if page_imgs %}
-  <section class="pageimages">
+  <section class="pageimages" id="source">
     <h2>Source pages <span class="from">{{ section.page_label }}</span></h2>
-    <p class="muted">Everything on this page is generated from these original datasheet page{{ '' if page_imgs|length == 1 else 's' }}.</p>
     <div class="thumbs">
       {% for img in page_imgs %}
       <figure class="thumb">
@@ -79,13 +81,13 @@
   {% endif %}
 
   {% if formatted %}
-  <section class="formatted">
+  <section class="formatted" id="formatted">
     <h2>Formatted text</h2>
     {{ formatted | safe }}
   </section>
   {% endif %}
 
-  <details class="rawtext">
+  <details class="rawtext" id="rawtext">
     <summary>Raw extracted text</summary>
     <div class="bodytext">
       {{ body | safe }}

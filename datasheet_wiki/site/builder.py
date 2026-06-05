@@ -39,7 +39,7 @@ class SiteBuilder:
         return [{"title": s.title, "url": s.url} for s in chain]
 
     def _nav_tree(self, sections: List[Section], by_id: Dict[str, Section]) -> List[dict]:
-        nodes = {s.id: {"id": s.id, "title": s.title, "url": s.url, "number": s.number, "children": []}
+        nodes = {s.id: {"id": s.id, "title": s.short_title, "url": s.url, "number": s.number, "children": []}
                  for s in sections}
         roots: List[dict] = []
         for s in sections:
@@ -88,7 +88,7 @@ class SiteBuilder:
         total_regs = sum(len(e.registers) for e in enrichments.values())
         total_code = sum(len(e.code_examples) for e in enrichments.values())
         top_sections = [
-            {"title": s.title, "url": s.url, "number": s.number, "page": s.page_label}
+            {"title": s.short_title, "url": s.url, "number": s.number, "page": s.page_label}
             for s in sections
             if s.level == 1
         ]

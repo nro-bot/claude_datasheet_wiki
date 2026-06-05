@@ -56,6 +56,10 @@ code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, m
 .muted { color: var(--muted); }
 .secnum { color: var(--accent2); font-variant-numeric: tabular-nums; }
 .crumbs { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.section-toc { text-align: right; margin: -2px 0 22px; font-size: 13px; }
+.section-toc a { color: var(--link); }
+.section-toc a + a::before { content: "|"; color: var(--border); margin: 0 10px; }
+:target { scroll-margin-top: 64px; }
 
 /* index */
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 20px 0; }
