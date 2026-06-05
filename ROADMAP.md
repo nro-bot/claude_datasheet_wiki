@@ -38,4 +38,4 @@ Status legend: ✅ done · 🚧 in progress · ⬜ planned
 - ⬜ **Single-file / PWA offline export** + print stylesheet.
 
 ## Trust
-- ⬜ **Provenance + confidence badges** (heuristic vs LLM) on every datum.
+- ✅ **Provenance + confidence badges** (heuristic vs LLM) on every datum.

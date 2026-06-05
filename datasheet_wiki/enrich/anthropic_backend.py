@@ -110,7 +110,9 @@ class AnthropicBackend(Backend):
         return True
 
     def enrich(self, title: str, text: str) -> Enrichment:
-        base = baseline(title, text, backend=self.name)
+        # tag the heuristic baseline as 'none'; merge_llm_json re-tags it with
+        # this backend's name only when the API call actually succeeds.
+        base = baseline(title, text, backend="none")
         if not text.strip():
             return base
         try:

@@ -89,6 +89,13 @@ def test_page_manifest(wiki: Path):
     assert '"n":1' in js
 
 
+def test_provenance_badges(wiki: Path):
+    html = (wiki / "sections" / "3-timer-counter.html").read_text()
+    # small tier -> heuristic badge on summary, registers and code headings
+    assert html.count('class="prov prov-heuristic"') == 3
+    assert "prov-llm" not in html
+
+
 def test_glossary_page_and_summary_tooltips(wiki: Path):
     gloss = (wiki / "glossary.html").read_text()
     assert "Glossary" in gloss

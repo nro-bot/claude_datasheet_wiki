@@ -302,3 +302,9 @@ abbr.gloss { text-decoration: underline dotted; text-underline-offset: 2px; curs
 dl.glossary { display: grid; grid-template-columns: max-content 1fr; gap: 6px 18px; margin-top: 16px; }
 dl.glossary dt { font-weight: 700; color: var(--accent2); font-family: "SFMono-Regular", Consolas, monospace; }
 dl.glossary dd { margin: 0; color: var(--text); }
+
+/* provenance / confidence badges */
+.prov { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em;
+  border-radius: 10px; padding: 1px 8px; vertical-align: middle; cursor: help; white-space: nowrap; }
+.prov-heuristic { background: rgba(255,180,84,.14); color: var(--accent2); border: 1px solid rgba(255,180,84,.4); }
+.prov-llm { background: rgba(92,200,255,.14); color: var(--accent); border: 1px solid rgba(92,200,255,.4); }

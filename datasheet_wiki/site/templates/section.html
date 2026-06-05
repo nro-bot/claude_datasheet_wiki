@@ -15,7 +15,7 @@
 
   {% if enrichment.summary %}
   <div class="summary" id="summary">
-    <h2>Summary <span class="from">generated from {{ section.page_label }}</span> {{ pl('summary', 'Summary') }}</h2>
+    <h2>Summary <span class="from">generated from {{ section.page_label }}</span> {{ m.prov(enrichment.backend, meta.model) }} {{ pl('summary', 'Summary') }}</h2>
     <p>{{ summary_html | safe }}</p>
     {% if enrichment.keywords %}
     <p class="tags">{% for k in enrichment.keywords %}<span class="tag">{{ k }}</span>{% endfor %}</p>
@@ -49,14 +49,14 @@
 
   {% if enrichment.registers %}
   <section class="registers" id="registers">
-    <h2>Registers {{ pl('registers', 'Registers') }}</h2>
+    <h2>Registers {{ m.prov(enrichment.backend, meta.model) }} {{ pl('registers', 'Registers') }}</h2>
     {% for r in enrichment.registers %}{{ m.register_block(r) }}{% endfor %}
   </section>
   {% endif %}
 
   {% if enrichment.code_examples %}
   <section class="code-examples" id="code">
-    <h2>Code examples {{ pl('code', 'Code examples') }}</h2>
+    <h2>Code examples {{ m.prov(enrichment.backend, meta.model) }} {{ pl('code', 'Code examples') }}</h2>
     {% for c in enrichment.code_examples %}{{ m.code_figure(c) }}{% endfor %}
   </section>
   {% endif %}
