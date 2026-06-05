@@ -57,4 +57,20 @@
   }
   window.addEventListener("hashchange", openTargetDetails);
   openTargetDetails();
+
+  // Permalinks: clicking the "#" next to a heading still updates the URL hash
+  // (default), and additionally copies the absolute link to the clipboard.
+  document.querySelectorAll(".permalink").forEach(function (a) {
+    a.addEventListener("click", function () {
+      var url = location.href.split("#")[0] + a.getAttribute("href");
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).catch(function () {});
+      }
+      var tip = document.createElement("span");
+      tip.className = "copied";
+      tip.textContent = "Link copied";
+      a.appendChild(tip);
+      setTimeout(function () { tip.remove(); }, 1200);
+    });
+  });
 })();

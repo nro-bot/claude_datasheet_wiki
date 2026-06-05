@@ -56,10 +56,20 @@ code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, m
 .muted { color: var(--muted); }
 .secnum { color: var(--accent2); font-variant-numeric: tabular-nums; }
 .crumbs { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
-.section-toc { text-align: right; margin: -2px 0 22px; font-size: 13px; }
+.section-toc { margin: 6px 0 24px; }
 .section-toc a { color: var(--link); }
-.section-toc a + a::before { content: "|"; color: var(--border); margin: 0 10px; }
+.section-toc a + a::before { content: "|"; color: var(--border); margin: 0 12px; }
 :target { scroll-margin-top: 64px; }
+
+/* heading permalinks */
+.prose h1, .prose h2 { position: relative; }
+.permalink { margin-left: 8px; color: var(--muted); font-weight: 400; text-decoration: none;
+  font-size: .72em; opacity: 0; vertical-align: middle; transition: opacity .12s; }
+.prose h2:hover .permalink, .summary:hover .permalink, .permalink:focus { opacity: .55; }
+.permalink:hover { opacity: 1; color: var(--accent); text-decoration: none; }
+.permalink .copied { position: absolute; white-space: nowrap; margin-left: 6px; font-size: 11px;
+  color: var(--accent2); background: var(--panel); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1px 7px; opacity: 1; }
 
 /* index */
 .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin: 20px 0; }

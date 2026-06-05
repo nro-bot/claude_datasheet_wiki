@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %}{{ section.title }}{% endblock %}
+{% macro pl(anchor, label) %}<a class="permalink" href="#{{ anchor }}" aria-label="Permalink to {{ label }}" title="Copy link to this section">#</a>{% endmacro %}
 {% block content %}
 <article class="prose section">
   <nav class="crumbs">
@@ -10,11 +11,10 @@
   </nav>
 
   <h1>{% if section.number %}<span class="secnum">{{ section.number }}</span> {% endif %}{{ section.short_title }}</h1>
-  <p class="muted">Datasheet {{ section.page_label }}</p>
 
   {% if enrichment.summary %}
-  <div class="summary">
-    <h2>Summary <span class="from">generated from {{ section.page_label }}</span></h2>
+  <div class="summary" id="summary">
+    <h2>Summary <span class="from">generated from {{ section.page_label }}</span> {{ pl('summary', 'Summary') }}</h2>
     <p>{{ enrichment.summary }}</p>
     {% if enrichment.keywords %}
     <p class="tags">{% for k in enrichment.keywords %}<span class="tag">{{ k }}</span>{% endfor %}</p>
@@ -32,7 +32,7 @@
 
   {% if page_imgs %}
   <section class="pageimages" id="source">
-    <h2>Source pages <span class="from">{{ section.page_label }}</span></h2>
+    <h2>Source pages {{ pl('source', 'Source pages') }}</h2>
     <div class="thumbs">
       {% for img in page_imgs %}
       <figure class="thumb">
@@ -47,8 +47,8 @@
   {% endif %}
 
   {% if enrichment.registers %}
-  <section class="registers">
-    <h2>Registers</h2>
+  <section class="registers" id="registers">
+    <h2>Registers {{ pl('registers', 'Registers') }}</h2>
     {% for r in enrichment.registers %}
     <div class="register">
       <h3>{{ r.name }}{% if r.address %} <code class="addr">{{ r.address }}</code>{% endif %}</h3>
@@ -70,7 +70,7 @@
 
   {% if enrichment.code_examples %}
   <section class="code-examples" id="code">
-    <h2>Code examples</h2>
+    <h2>Code examples {{ pl('code', 'Code examples') }}</h2>
     {% for c in enrichment.code_examples %}
     <figure class="code">
       <figcaption>{{ c.title }} <span class="lang">{{ c.language }}</span></figcaption>
@@ -82,7 +82,7 @@
 
   {% if formatted %}
   <section class="formatted" id="formatted">
-    <h2>Formatted text</h2>
+    <h2>Formatted text {{ pl('formatted', 'Formatted text') }}</h2>
     {{ formatted | safe }}
   </section>
   {% endif %}

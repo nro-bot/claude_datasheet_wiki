@@ -60,9 +60,15 @@ def test_section_layout_and_provenance(wiki: Path):
         assert label in html
     for anchor in ('id="source"', 'id="formatted"', 'id="rawtext"'):
         assert anchor in html
-    # per-page provenance blurb removed
+    # per-page provenance blurb + page-label lines removed
     assert "how is this generated?" not in html
     assert "Everything on this page" not in html
+    assert "Datasheet p.4" not in html          # header page label gone
+    assert 'Source pages <a class="permalink"' in html  # no page label by the heading
+    # permalinks to deep-link each section
+    assert html.count('class="permalink"') >= 4
+    for anchor in ('id="summary"', 'id="registers"'):
+        assert anchor in html
 
 
 def test_section_number_not_duplicated(wiki: Path):
