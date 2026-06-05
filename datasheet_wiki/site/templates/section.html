@@ -33,6 +33,7 @@
     <a href="#rawtext">Raw Text</a>
   </nav>
 
+  {# source page floats left, formatted text flows beside it (see CSS) #}
   {% if page_imgs %}
   <section class="pageimages" id="source">
     <h2>Source pages {{ pl('source', 'Source pages') }}</h2>
@@ -49,6 +50,13 @@
   </section>
   {% endif %}
 
+  {% if formatted %}
+  <section class="formatted" id="formatted">
+    <h2>Formatted text {{ pl('formatted', 'Formatted text') }}</h2>
+    {{ formatted | safe }}
+  </section>
+  {% endif %}
+
   {% if enrichment.registers %}
   <section class="registers" id="registers">
     <h2>Registers {{ m.prov(enrichment.backend, meta.model) }} {{ pl('registers', 'Registers') }}</h2>
@@ -60,13 +68,6 @@
   <section class="code-examples" id="code">
     <h2>Code examples {{ m.prov(enrichment.backend, meta.model) }} {{ pl('code', 'Code examples') }}</h2>
     {% for c in enrichment.code_examples %}{{ m.code_figure(c) }}{% endfor %}
-  </section>
-  {% endif %}
-
-  {% if formatted %}
-  <section class="formatted" id="formatted">
-    <h2>Formatted text {{ pl('formatted', 'Formatted text') }}</h2>
-    {{ formatted | safe }}
   </section>
   {% endif %}
 

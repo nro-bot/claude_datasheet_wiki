@@ -174,12 +174,23 @@ details.rawtext .bodytext p { color: var(--muted); }
 
 .prevnext { display: flex; justify-content: space-between; margin-top: 40px; gap: 10px; }
 .prevnext a { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; max-width: 48%; }
-.prevnext-top { display: flex; gap: 6px; justify-content: flex-end; margin: -2px 0 10px; }
+.prevnext-top { display: flex; gap: 8px; justify-content: flex-end; margin: 0 0 8px; }
 .prevnext-top a, .prevnext-top span { display: inline-flex; align-items: center; justify-content: center;
-  width: 34px; height: 30px; border: 1px solid var(--border); border-radius: 6px; color: var(--text);
-  background: var(--panel); font-size: 17px; line-height: 1; }
+  width: 50px; height: 44px; border: 1px solid var(--border); border-radius: 8px; color: var(--text);
+  background: var(--panel); font-size: 28px; line-height: 1; }
 .prevnext-top span { opacity: .3; }
 .prevnext-top a:hover { background: var(--panel2); text-decoration: none; color: var(--accent); }
+
+/* source page floats left, formatted text flows beside it (side-by-side);
+   everything after clears to full width below. */
+@media (min-width: 821px) {
+  .prose.section .pageimages { float: left; width: 40%; margin: 0 26px 18px 0; }
+  .prose.section .pageimages h2 { margin-top: 0; }
+  .prose.section .pageimages .thumbs { grid-template-columns: 1fr; }
+  .prose.section .formatted h2 { margin-top: 0; }
+  .prose.section .registers, .prose.section .code-examples,
+  .prose.section .rawtext, .prose.section .notes, .prose.section .prevnext { clear: both; }
+}
 .pagefoot { margin-top: 50px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
 
 /* search */
