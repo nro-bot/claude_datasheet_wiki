@@ -84,9 +84,10 @@
       <th>Search</th>
       <td>A full-text <abbr title="term frequency–inverse document frequency">tf-idf</abbr>
         index is prebuilt and shipped as a JavaScript file so search works even
-        over <code>file://</code>{% if meta.semantic %}; this build also includes
-        a local semantic-embedding index for meaning-based search{% endif %}.
-        <span class="how-tier">{{ 'local (+ local embeddings)' if meta.semantic else 'always local' }}</span></td>
+        over <code>file://</code>{% if meta.semantic %}; this build also generates
+        a local embedding index (a building block for the planned semantic Q&amp;A —
+        the search page itself is full-text){% endif %}.
+        <span class="how-tier">{{ 'local (+ embeddings)' if meta.semantic else 'always local' }}</span></td>
     </tr>
   </table>
 

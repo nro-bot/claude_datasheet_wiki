@@ -1,9 +1,7 @@
-// Client-side search over window.DSW_SEARCH (tf-idf full text) plus optional
-// window.DSW_VECTORS (local semantic embeddings). Fully offline.
+// Client-side full-text search over window.DSW_SEARCH (tf-idf). Fully offline.
 (function () {
   var root = window.DSW_ROOT || "";
   var DATA = window.DSW_SEARCH;
-  var VEC = window.DSW_VECTORS || null;
   var input = document.getElementById("q");
   var resultsEl = document.getElementById("results");
   var statusEl = document.getElementById("search-status");
@@ -40,14 +38,6 @@
       .slice(0, 40);
   }
 
-  function semanticSearch(q) {
-    // very small bag-of-words pseudo-embedding is not meaningful; instead, if
-    // vectors exist we still rank by text but tag chunk-level hits. True query
-    // embedding needs the model, which isn't in the browser — so we surface the
-    // best-matching chunk snippet per section from VEC for context.
-    return null;
-  }
-
   function highlight(text, terms) {
     var out = text;
     terms.forEach(function (t) {
@@ -62,8 +52,7 @@
     var terms = tokenize(q);
     var hits = textSearch(q);
     if (!q.trim()) { resultsEl.innerHTML = ""; statusEl.textContent = ""; return; }
-    statusEl.textContent = hits.length + " result" + (hits.length === 1 ? "" : "s") +
-      (VEC ? " · semantic index loaded" : "");
+    statusEl.textContent = hits.length + " result" + (hits.length === 1 ? "" : "s");
     resultsEl.innerHTML = hits.map(function (h) {
       var d = DATA.docs[h.i];
       return '<div class="result">' +

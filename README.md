@@ -64,7 +64,7 @@ Beyond the per-section pages, every generated wiki includes:
 - **Personal Reference** (`starred.html`) — ★ any source page and it lands in a
   thumbnail gallery (adjustable thumbnail size), saved in your browser per
   datasheet.
-- **Code examples** index, **full-text search** (+ optional local semantic search),
+- **Code examples** index, **full-text search**,
   an **image lightbox**, and heading **permalinks**.
 
 All of these run entirely client-side and work offline.
@@ -74,7 +74,7 @@ All of these run entirely client-side and work offline.
 | Tier | Backend | What you get | Needs |
 |------|---------|--------------|-------|
 | **small** | none (heuristics) | Page images, full-text search, auto cross-reference links, register/bit-field detection, code-block detection. **No LLM, runs on any laptop in minutes.** | nothing extra |
-| **medium** | **local LLM via [Ollama](https://ollama.com)** | Everything in small **+** per-section plain-English summaries, structured register extraction, generated code examples, **+ local semantic search**. **Nothing leaves your machine.** | `ollama` + `uv sync --extra local` |
+| **medium** | **local LLM via [Ollama](https://ollama.com)** | Everything in small **+** per-section plain-English summaries, structured register extraction, generated code examples, **+ a local embedding index** (for the planned Q&A). **Nothing leaves your machine.** | `ollama` + `uv sync --extra local` |
 | **large** | **Claude API** | Highest-quality summaries, register extraction, and code examples. | `uv sync --extra api` + `ANTHROPIC_API_KEY` |
 
 The cross-reference linking, register/code detection, page images, and full-text
@@ -149,7 +149,7 @@ Useful `build` options:
 | `--backend {none,ollama,anthropic}` | Override the tier's backend. |
 | `--model NAME` | LLM model id (Ollama or Claude). |
 | `--dpi N` | Page-image resolution (tier default 120/150/200). |
-| `--semantic` | Add local semantic search (needs `[local]` extra). |
+| `--semantic` | Build a local embedding index (needs `[local]` extra; for the planned Q&A). |
 | `--no-images` | Skip page images (smaller, faster). |
 | `--max-pages N` | Only process the first N pages — great for a quick test on a 600-page PDF. |
 | `--no-resume` | Ignore caches and rebuild from scratch. |
@@ -182,7 +182,7 @@ PDF ─┬─ render every page → images/            (PyMuPDF)
 ```
 wiki/<name>/
 ├── index.html              # overview + stats + table of contents
-├── search.html             # client-side full-text (+ optional semantic) search
+├── search.html             # client-side full-text search
 ├── about.html              # provenance + copyright notice
 ├── sections/<id>.html      # one page per datasheet section
 ├── images/page-NNNN.png    # rendered source pages
@@ -194,7 +194,7 @@ wiki/<name>/
 
 - Python 3.9+
 - Core: `PyMuPDF`, `Jinja2` (installed automatically).
-- `[local]` extra: `sentence-transformers`, `numpy` (medium-tier semantic search).
+- `[local]` extra: `sentence-transformers`, `numpy` (medium-tier embedding index).
 - `[api]` extra: `anthropic` (large tier).
 
 ## Hosting your own datasheet wiki

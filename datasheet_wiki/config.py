@@ -7,7 +7,7 @@ of compute, including locally instead of an LLM API" requirement:
     medium  -> a *local* LLM via Ollama (+ optional local embeddings). No API,
                nothing leaves your machine.
     large   -> a cloud LLM API (Anthropic by default) for the best summaries,
-               register extraction, code examples and semantic search.
+               register extraction, code examples and a local embedding index.
 
 `--backend`, `--dpi`, `--semantic` etc. can override any preset value.
 """
@@ -45,14 +45,14 @@ TIER_PRESETS = {
         dpi=150,
         semantic=True,
         description="Local LLM via Ollama + local embeddings. Per-section "
-        "summaries and semantic search. Nothing leaves your machine.",
+        "summaries and a local embedding index. Nothing leaves your machine.",
     ),
     "large": TierPreset(
         backend="anthropic",
         dpi=200,
         semantic=True,
         description="Cloud LLM API. Best summaries, structured register "
-        "extraction, generated code examples, semantic search.",
+        "extraction, generated code examples, embedding index.",
     ),
 }
 
