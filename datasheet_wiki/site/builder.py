@@ -63,6 +63,7 @@ class SiteBuilder:
         sections: List[Section],
         enrichments: Dict[str, Enrichment],
         pages_manifest: Optional[List[dict]] = None,
+        svd_reg_groups: Optional[List[dict]] = None,
         progress: bool = True,
     ) -> None:
         by_id = {s.id: s for s in sections}
@@ -115,8 +116,24 @@ class SiteBuilder:
             "wiki_id": wiki_id,
         }
 
+        # register map source: authoritative SVD (if supplied) or PDF heuristics
+        if svd_reg_groups:
+            reg_groups = [
+                {"id": slugify(g["title"]) or f"periph-{i}", "title": g["title"],
+                 "number": "", "url": "", "registers": g["registers"]}
+                for i, g in enumerate(svd_reg_groups)
+            ]
+            register_source = "svd"
+        else:
+            reg_groups = [
+                {"id": sec.id, "title": sec.short_title, "number": sec.number,
+                 "url": sec.url, "registers": (enrichments.get(sec.id) or Enrichment()).registers}
+                for sec in sections if (enrichments.get(sec.id) or Enrichment()).registers
+            ]
+            register_source = "heuristic"
+        register_count = sum(len(g["registers"]) for g in reg_groups)
+
         # index page
-        total_regs = sum(len(e.registers) for e in enrichments.values())
         total_code = sum(len(e.code_examples) for e in enrichments.values())
         top_sections = [
             {"title": s.short_title, "url": s.url, "number": s.number, "page": s.page_label}
@@ -128,7 +145,7 @@ class SiteBuilder:
             self.env.get_template("index.html").render(
                 root="", page="home", current_url="",
                 top_sections=top_sections,
-                stats={"sections": len(sections), "registers": total_regs,
+                stats={"sections": len(sections), "registers": register_count,
                        "code": total_code, "pages": self.meta.get("page_count", 0)},
                 **common,
             ),
@@ -158,12 +175,6 @@ class SiteBuilder:
             ),
         )
         # register map index + generated C header / SVD
-        reg_groups = []
-        for sec in sections:
-            regs = (enrichments.get(sec.id) or Enrichment()).registers
-            if regs:
-                reg_groups.append({"id": sec.id, "title": sec.short_title, "number": sec.number,
-                                   "url": sec.url, "registers": regs})
         from ..codegen import build_c_header, build_svd
 
         device = (self.meta.get("title") or "device").split()[0]
@@ -177,7 +188,8 @@ class SiteBuilder:
             "registers.html",
             self.env.get_template("registers.html").render(
                 root="", page="registers", current_url="",
-                reg_groups=reg_groups, register_count=total_regs,
+                reg_groups=reg_groups, register_count=register_count,
+                register_source=register_source,
                 c_header=c_header, has_svd=bool(svd), **common,
             ),
         )

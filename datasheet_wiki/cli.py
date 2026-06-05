@@ -29,6 +29,7 @@ def _build(args: argparse.Namespace) -> int:
         "ollama_host": args.ollama_host,
         "progress": False if args.quiet else None,
         "embed_model": args.embed_model,
+        "svd_path": Path(args.svd) if args.svd else None,
     }
     cfg = Config.from_tier(pdf, out, args.compute, **overrides)
 
@@ -122,6 +123,7 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--backend", choices=["none", "ollama", "anthropic"], help="Override the tier's enrichment backend.")
     b.add_argument("--model", help="LLM model id (ollama/anthropic backends).")
     b.add_argument("--dpi", type=int, help="Page render DPI (override tier default).")
+    b.add_argument("--svd", help="CMSIS-SVD file: authoritative registers for the register map and device.h export.")
     b.add_argument("--semantic", action="store_true", help="Build a local embedding index (sentence-transformers; for the planned Q&A).")
     b.add_argument("--embed-model", help="sentence-transformers model for the embedding index.")
     b.add_argument("--no-images", action="store_true", help="Skip rendering page images (faster, smaller).")

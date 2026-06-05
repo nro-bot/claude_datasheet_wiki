@@ -6,15 +6,18 @@
   <h1>Register map</h1>
   {% if reg_groups %}
   <p class="lead">{{ register_count }} register{{ '' if register_count == 1 else 's' }}
-    across {{ reg_groups|length }} section{{ '' if reg_groups|length == 1 else 's' }}.
+    across {{ reg_groups|length }} {{ 'peripheral' if register_source == 'svd' else 'section' }}{{ '' if reg_groups|length == 1 else 's' }}.
     Each has an interactive bit-field calculator.</p>
+  {% if register_source == 'svd' %}
+  <p class="muted">Authoritative register data from <code>{{ meta.svd_name }}</code> (CMSIS-SVD).</p>
+  {% endif %}
 
   {% if c_header %}
   <div class="export">
     <a class="btn btn-ghost" href="device.h" download>⤓ device.h</a>
     {% if has_svd %}<a class="btn btn-ghost" href="device.svd" download>⤓ CMSIS-SVD</a>{% endif %}
     <details class="codefold"><summary><span class="cf-label">Preview</span> <code>device.h</code></summary><pre><code>{{ c_header }}</code></pre></details>
-    <p class="muted small">Heuristic export — verify addresses, widths and bit positions against the datasheet.</p>
+    <p class="muted small">{% if register_source == 'svd' %}Generated from the supplied SVD.{% else %}Heuristic export — verify addresses, widths and bit positions against the datasheet.{% endif %}</p>
   </div>
   {% endif %}
 
@@ -27,7 +30,7 @@
 
   {% for g in reg_groups %}
   <section class="reg-group" id="{{ g.id }}">
-    <h2><a href="{{ root }}{{ g.url }}#registers">{% if g.number %}{{ g.number }} {% endif %}{{ g.title }}</a></h2>
+    <h2>{% if g.url %}<a href="{{ root }}{{ g.url }}#registers">{% if g.number %}{{ g.number }} {% endif %}{{ g.title }}</a>{% else %}{{ g.title }}{% endif %}</h2>
     {% for r in g.registers %}{{ m.register_block(r) }}{% endfor %}
   </section>
   {% endfor %}

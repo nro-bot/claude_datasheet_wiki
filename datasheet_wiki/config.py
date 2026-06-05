@@ -77,6 +77,10 @@ class Config:
     embed_model: str = "all-MiniLM-L6-v2"  # local sentence-transformers model
     chunk_chars: int = 1200  # target size of a search/embedding chunk
 
+    # Authoritative register data (CMSIS-SVD); overrides PDF heuristics for the
+    # register map + C-header export when supplied.
+    svd_path: Optional[Path] = None
+
     # Scope / performance
     max_pages: int = 0  # 0 == all pages (useful for quick test runs)
     resume: bool = True

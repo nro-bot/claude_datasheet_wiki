@@ -148,6 +148,18 @@ def run(cfg: Config) -> Path:
             "t": (pages[p].text or "")[:2500] if p < len(pages) else "",
         })
 
+    # authoritative registers from a CMSIS-SVD, if supplied
+    svd_reg_groups = None
+    if cfg.svd_path:
+        from .svd import parse_svd
+
+        try:
+            svd_reg_groups = parse_svd(cfg.svd_path)
+            log(f"SVD: {sum(len(g['registers']) for g in svd_reg_groups)} registers "
+                f"across {len(svd_reg_groups)} peripherals from {cfg.svd_path.name}")
+        except Exception as exc:
+            log(f"WARNING: could not parse SVD {cfg.svd_path} ({exc}); using PDF heuristics.")
+
     # 6. site
     log("Rendering site...")
     meta = {
@@ -159,9 +171,11 @@ def run(cfg: Config) -> Path:
         "model": cfg.model,
         "dpi": cfg.dpi,
         "semantic": semantic_ok,
+        "svd_name": cfg.svd_path.name if cfg.svd_path else None,
     }
     SiteBuilder(cfg.out_dir, meta).build(
-        sections, enrichments, pages_manifest=pages_manifest, progress=cfg.progress
+        sections, enrichments, pages_manifest=pages_manifest,
+        svd_reg_groups=svd_reg_groups, progress=cfg.progress,
     )
 
     dt = time.time() - t0

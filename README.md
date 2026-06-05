@@ -149,6 +149,7 @@ Useful `build` options:
 | `--backend {none,ollama,anthropic}` | Override the tier's backend. |
 | `--model NAME` | LLM model id (Ollama or Claude). |
 | `--dpi N` | Page-image resolution (tier default 120/150/200). |
+| `--svd FILE` | Use a CMSIS-SVD file as the authoritative register source (register map + `device.h`). |
 | `--semantic` | Build a local embedding index (needs `[local]` extra; for the planned Q&A). |
 | `--no-images` | Skip page images (smaller, faster). |
 | `--max-pages N` | Only process the first N pages — great for a quick test on a 600-page PDF. |

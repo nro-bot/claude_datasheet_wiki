@@ -24,7 +24,7 @@ Status legend: ✅ done · 🚧 in progress · ⬜ planned
 - ✅ **Interactive bit-field calculator**: on each register table, enter field
   values → live hex/binary register value, and decode a pasted hex value back.
 - ✅ **Export to C header / CMSIS-SVD** from detected registers.
-- ⬜ **Import an existing SVD** for authoritative register data.
+- ✅ **Import an existing SVD** for authoritative register data.
 
 ## Search & navigation
 - ✅ **Ctrl-K command palette** (jump to section/register/pin).
