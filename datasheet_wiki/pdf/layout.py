@@ -57,15 +57,23 @@ def is_data_like(text: str) -> bool:
 
 
 def merge_short_blocks(blocks: List[Block]) -> List[Block]:
-    """Merge runs of >=3 consecutive short, data-like paragraphs into one
-    compact line — the scattered cells of a small table."""
+    """Merge runs of >=3 consecutive short, data-like paragraphs (the scattered
+    cells of a small table) into one collapsed code block: the compact line is
+    shown while collapsed, the raw cells when expanded."""
     out: List[Block] = []
     run: List[Block] = []
 
     def flush():
         if len(run) >= 3:
-            joined = " ".join(strip_bold(b.text) for b in run if b.text)
-            out.append(Block(kind="para", text=joined, page=run[0].page))
+            cells = [strip_bold(b.text) for b in run if b.text]
+            out.append(
+                Block(
+                    kind="codefold",
+                    summary=" ".join(cells),
+                    text="\n".join(cells),
+                    page=run[0].page,
+                )
+            )
         else:
             out.extend(run)
         run.clear()
@@ -136,8 +144,9 @@ def _is_bold(span: dict) -> bool:
     return any(k in font for k in ("bold", "black", "heavy", "semibold"))
 
 
-def _block_text_and_meta(block: dict) -> Tuple[str, float, float]:
-    """Return (reflowed text with bold sentinels, max font size, bold char frac)."""
+def _block_text_and_meta(block: dict) -> Tuple[str, float, float, List[str]]:
+    """Return (reflowed text w/ bold sentinels, max font size, bold char frac,
+    the raw per-line strings)."""
     lines: List[str] = []
     max_size = 0.0
     bold_chars = total_chars = 0
@@ -156,7 +165,18 @@ def _block_text_and_meta(block: dict) -> Tuple[str, float, float]:
         if parts:
             lines.append("".join(parts))
     frac = (bold_chars / total_chars) if total_chars else 0.0
-    return join_lines(lines), max_size, frac
+    return join_lines(lines), max_size, frac, lines
+
+
+def is_table_block(lines: List[str]) -> bool:
+    """A single text block that is really a table column/grid: many lines that
+    are each a short token."""
+    cleaned = [strip_bold(ln).strip() for ln in lines]
+    cleaned = [c for c in cleaned if c]
+    if len(cleaned) < 3:
+        return False
+    short = sum(1 for c in cleaned if len(c) <= 8 and len(c.split()) <= 2)
+    return short / len(cleaned) >= 0.6
 
 
 def _body_size(page_dict: dict) -> float:
@@ -201,22 +221,31 @@ def extract_page_blocks(
         bb = b.get("bbox", (0, 0, 0, 0))
         if b.get("type") == 1:
             if extract_figures and figures_dir is not None:
-                fig = _save_image_block(b, page_index, figures_dir, min_fig_px)
+                fig = _save_image_block(b, page_index, figures_dir, min_fig_px, page)
                 if fig:
                     entries.append((bb[1], bb[3], fig))
                     image_y.append((bb[1], bb[3]))
             continue
-        text, max_size, bold_frac = _block_text_and_meta(b)
+        text, max_size, bold_frac, raw_lines = _block_text_and_meta(b)
         if not strip_bold(text).strip():
             continue
         text_only.append(text)
         lefts.append(bb[0])
-        blk = classify_block(text, max_size, body, bold_frac)
-        blk.page = page_index
+        if is_table_block(raw_lines):
+            cells = [strip_bold(ln).strip() for ln in raw_lines if strip_bold(ln).strip()]
+            blk = Block(kind="codefold", summary=" ".join(cells),
+                        text="\n".join(cells), page=page_index)
+        else:
+            blk = classify_block(text, max_size, body, bold_frac)
+            blk.page = page_index
         entries.append((bb[1], bb[3], blk))
 
     if looks_like_table_page(text_only):
-        return [Block(kind="table_note", page=page_index)]
+        raw = page.get_text("text").strip()
+        out = [Block(kind="table_note", page=page_index)]
+        if raw:
+            out.append(Block(kind="codefold", text=raw, page=page_index))
+        return out
 
     # inline (vector) figures: large blank-looking gaps that actually contain
     # drawing. Only attempt on roughly single-column pages to stay safe.
@@ -235,7 +264,9 @@ def _single_column(lefts: List[float]) -> bool:
     return (hi - lo) < 120  # all text starts at a similar x
 
 
-def _save_image_block(b: dict, page_index: int, figures_dir: Path, min_fig_px: int) -> Optional[Block]:
+def _save_image_block(
+    b: dict, page_index: int, figures_dir: Path, min_fig_px: int, page=None
+) -> Optional[Block]:
     if b.get("width", 0) < min_fig_px or b.get("height", 0) < min_fig_px:
         return None
     img = b.get("image")
@@ -245,7 +276,16 @@ def _save_image_block(b: dict, page_index: int, figures_dir: Path, min_fig_px: i
     ensure_dir(figures_dir)
     name = f"fig-p{page_index + 1:04d}-{b.get('number', 0)}.{ext}"
     (figures_dir / name).write_bytes(img)
-    return Block(kind="figure", image_rel=f"figures/{name}", page=page_index)
+    # any text overlaid on the figure -> show it as a collapsed code block
+    region_text = ""
+    if page is not None and b.get("bbox"):
+        try:
+            import fitz
+
+            region_text = page.get_textbox(fitz.Rect(b["bbox"])).strip()
+        except Exception:
+            region_text = ""
+    return Block(kind="figure", image_rel=f"figures/{name}", text=region_text, page=page_index)
 
 
 def _gap_figures(

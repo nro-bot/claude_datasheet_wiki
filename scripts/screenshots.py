@@ -23,6 +23,7 @@ html, body { background: #0f1115; }
 .layout { align-items: stretch; }
 /* WeasyPrint can't toggle <details>; show the closed (default) state */
 details.rawtext > .bodytext { display: none; }
+details.codefold > pre { display: none; }
 """)
 def _content_height(pix, scale):
     """Find the last row with real content (trim trailing uniform background,

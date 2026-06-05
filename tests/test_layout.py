@@ -25,11 +25,14 @@ def test_reflow_joins_paragraph_lines():
 
 
 def test_merge_short_blocks_combines_scattered_cells():
-    # scattered single-cell blocks (as a real table column extracts) -> one line
+    # scattered single-cell blocks (as a real table column extracts) become a
+    # collapsed code block: one compact line shown, raw cells when expanded
     cells = [Block(kind="para", text=t) for t in ("Bit", "7", "6", "5", "4")]
     merged = merge_short_blocks(cells)
     assert len(merged) == 1
-    assert merged[0].text == "Bit 7 6 5 4"
+    assert merged[0].kind == "codefold"
+    assert merged[0].summary == "Bit 7 6 5 4"
+    assert merged[0].text == "Bit\n7\n6\n5\n4"
 
 
 def test_merge_keeps_prose():
@@ -78,3 +81,17 @@ def test_render_blocks_html():
     assert "<ul" in html and "<li>one</li>" in html
     assert 'src="../figures/fig-p0004-0.png"' in html
     assert "Detected table" in html and "image of page 5" in html
+
+
+def test_render_codefold_collapsed_one_line():
+    blocks = [Block(kind="codefold", summary="Bit 7 6 5 4", text="Bit\n7\n6\n5\n4", page=1)]
+    html = render_blocks(blocks, {}, {}, root="")
+    # a <details> (collapsed by default — no `open`) with the one-line peek in the
+    # summary and the full text in a <pre>
+    assert "<details" in html and "codefold" in html and " open" not in html
+    assert "<summary>" in html and "Bit 7 6 5 4" in html
+    assert "<pre><code>Bit\n7\n6\n5\n4</code></pre>" in html
+
+
+def test_render_codefold_skips_empty():
+    assert render_blocks([Block(kind="codefold", text="  ")], {}, {}, root="") == ""

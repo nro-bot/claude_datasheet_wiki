@@ -75,6 +75,24 @@ def linkify(text: str, number_index: Dict[str, str], page_index: Dict[int, str],
 _HEADING_TAG = {2: "h4", 3: "h5", 4: "h6"}
 
 
+def _codefold(text: str, summary: str, kind: str) -> str:
+    """A monospace block that starts collapsed showing one line, expandable."""
+    text = (text or "").strip()
+    if not text:
+        return ""
+    peek = (summary or "").strip() or next((ln for ln in text.splitlines() if ln.strip()), "")
+    peek = " ".join(peek.split())
+    if len(peek) > 90:
+        peek = peek[:90].rstrip() + "…"
+    label = "Table text" if kind == "table" else "Figure text"
+    return (
+        f'<details class="codefold codefold-{kind}">'
+        f'<summary><span class="cf-label">{label}</span> '
+        f'<code>{html.escape(peek)}</code></summary>'
+        f"<pre><code>{html.escape(text)}</code></pre></details>"
+    )
+
+
 def _inline(text: str, number_index: Dict[str, str], page_index: Dict[int, str], root: str) -> str:
     """Escape + cross-reference-link text, then turn bold sentinels into <strong>."""
     out = linkify(text, number_index, page_index, root)
@@ -103,6 +121,12 @@ def render_blocks(
                 f'<figure class="dsfig"><img loading="lazy" src="{root}{html.escape(b.image_rel)}" '
                 f'alt="Figure from page {b.page + 1}"></figure>'
             )
+            if b.text.strip():
+                out.append(_codefold(b.text, "Text in figure", "fig"))
+        elif b.kind == "codefold":
+            cf = _codefold(b.text, b.summary, "table")
+            if cf:
+                out.append(cf)
         elif b.kind == "table_note":
             if b.image_rel:
                 link = f'<a href="{root}{html.escape(b.image_rel)}" target="_blank" rel="noopener">image of page {b.page + 1}</a>'

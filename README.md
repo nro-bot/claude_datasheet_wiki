@@ -7,10 +7,12 @@ references ("see Section 4.3", "page 42"), detected registers/bit-fields,
 optional LLM-generated summaries and code examples.
 
 Each section shows a **Formatted text** view — the raw PDF text reflowed into
-real paragraphs, with table-column fragments (`Bit / 7 / 6 / 5 / 4`) collapsed
-back onto one line, figures cropped and embedded inline, and whole-page tables
-flagged with a link to the page image. The verbatim extracted text is kept too,
-in a collapsed "Raw extracted text" panel.
+real paragraphs, figures cropped and embedded inline, and whole-page tables
+flagged with a link to the page image. Text recovered from tables and figures
+(e.g. a register's `Bit / 7 / 6 / 5 / 4` column) is tucked into a **collapsed
+monospace block that shows one line and expands on click**, so it never clutters
+the prose. The verbatim extracted text is kept too, in a collapsed "Raw
+extracted text" panel.
 
 Built for everything from the 30-page ATtiny85 datasheet to the 600-page RP2040
 datasheet. Parsing can take minutes to hours depending on the tier you pick;

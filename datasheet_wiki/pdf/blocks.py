@@ -18,9 +18,11 @@ BOLD_END = ""
 
 @dataclass
 class Block:
-    kind: str               # 'para' | 'heading' | 'list' | 'figure' | 'table_note'
-    text: str = ""          # para/heading (may contain BOLD_* sentinels)
+    # 'para' | 'heading' | 'list' | 'figure' | 'table_note' | 'codefold'
+    kind: str
+    text: str = ""          # para/heading text, or full text for a codefold
     level: int = 0          # heading level (2 = biggest, 4 = smallest)
     items: List[str] = field(default_factory=list)  # list items
     image_rel: str = ""     # figure image, or page image for a table_note
+    summary: str = ""       # codefold: the single line shown while collapsed
     page: int = 0           # 0-based source page
