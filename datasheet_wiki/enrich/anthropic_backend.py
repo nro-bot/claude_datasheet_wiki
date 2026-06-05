@@ -1,6 +1,6 @@
 """Cloud LLM enrichment via the Claude API (the 'large' tier).
 
-Uses the official `anthropic` SDK. Requires `pip install datasheet-wiki[api]`
+Uses the official `anthropic` SDK. Requires `uv sync --extra api`
 and an ANTHROPIC_API_KEY in the environment.
 
 Cost notes for big datasheets:
@@ -95,7 +95,7 @@ class AnthropicBackend(Backend):
             except ImportError as exc:  # pragma: no cover
                 raise RuntimeError(
                     "The 'anthropic' package is required for the large tier. "
-                    "Install it with: pip install datasheet-wiki[api]"
+                    "Install it with: uv sync --extra api"
                 ) from exc
             # Anthropic() resolves ANTHROPIC_API_KEY from the environment.
             self._client = anthropic.Anthropic()

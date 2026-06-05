@@ -1,5 +1,6 @@
-# Core dependencies (the small / no-LLM tier). Optional tiers:
-#   medium (local LLM + semantic): pip install "datasheet-wiki[local]"  + Ollama
-#   large  (Claude API):           pip install "datasheet-wiki[api]"
+# Core dependencies (the small / no-LLM tier). This file is for plain-pip users;
+# the recommended workflow is `uv sync` against pyproject.toml. Optional tiers:
+#   medium (local LLM + semantic): uv sync --extra local   + Ollama
+#   large  (Claude API):           uv sync --extra api
 PyMuPDF>=1.23
 Jinja2>=3.1

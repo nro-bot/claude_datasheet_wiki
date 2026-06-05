@@ -29,8 +29,8 @@ it, keep it forever.
 | Tier | Backend | What you get | Needs |
 |------|---------|--------------|-------|
 | **small** | none (heuristics) | Page images, full-text search, auto cross-reference links, register/bit-field detection, code-block detection. **No LLM, runs on any laptop in minutes.** | nothing extra |
-| **medium** | **local LLM via [Ollama](https://ollama.com)** | Everything in small **+** per-section plain-English summaries, structured register extraction, generated code examples, **+ local semantic search**. **Nothing leaves your machine.** | `ollama` + `pip install datasheet-wiki[local]` |
-| **large** | **Claude API** | Highest-quality summaries, register extraction, and code examples. | `pip install datasheet-wiki[api]` + `ANTHROPIC_API_KEY` |
+| **medium** | **local LLM via [Ollama](https://ollama.com)** | Everything in small **+** per-section plain-English summaries, structured register extraction, generated code examples, **+ local semantic search**. **Nothing leaves your machine.** | `ollama` + `uv sync --extra local` |
+| **large** | **Claude API** | Highest-quality summaries, register extraction, and code examples. | `uv sync --extra api` + `ANTHROPIC_API_KEY` |
 
 The cross-reference linking, register/code detection, page images, and full-text
 search are **always** available — even in the no-LLM `small` tier — because they
@@ -41,43 +41,49 @@ hyperlinks the datasheet authors already embedded).
 
 ## Quickstart
 
+Uses [uv](https://docs.astral.sh/uv/) (`curl -LsSf https://astral.sh/uv/install.sh | sh`).
+
 ```bash
 git clone https://github.com/nro-bot/claude_datasheet_wiki
 cd claude_datasheet_wiki
-pip install -e .                       # installs the `datasheet-wiki` / `dsw` CLI
+uv sync                                # creates .venv and installs the CLI
 
 # Build (small tier, no LLM, fast):
-datasheet-wiki build path/to/attiny85.pdf
+uv run datasheet-wiki build path/to/attiny85.pdf
 
 # Serve it locally:
-datasheet-wiki serve wiki/attiny85
+uv run datasheet-wiki serve wiki/attiny85
 # → http://127.0.0.1:8000
 ```
+
+`uv run` auto-syncs the environment, so the first command bootstraps everything.
+(Prefer an activated venv? `source .venv/bin/activate` and drop the `uv run`
+prefix. Prefer plain pip semantics? `uv pip install -e .` works too.)
 
 No PDF handy? Generate a tiny synthetic one to see the whole thing work:
 
 ```bash
-python tests/make_sample_pdf.py sample.pdf
-datasheet-wiki build sample.pdf -o wiki/sample
-datasheet-wiki serve wiki/sample
+uv run python tests/make_sample_pdf.py sample.pdf
+uv run datasheet-wiki build sample.pdf -o wiki/sample
+uv run datasheet-wiki serve wiki/sample
 ```
 
 ### Medium tier (local LLM, nothing leaves your machine)
 
 ```bash
-pip install -e ".[local]"
+uv sync --extra local
 ollama pull llama3.1          # or qwen2.5, mistral, phi3 …
-datasheet-wiki build rp2040.pdf --compute medium --model llama3.1
+uv run datasheet-wiki build rp2040.pdf --compute medium --model llama3.1
 ```
 
 ### Large tier (Claude API)
 
 ```bash
-pip install -e ".[api]"
+uv sync --extra api
 export ANTHROPIC_API_KEY=sk-ant-...
-datasheet-wiki build rp2040.pdf --compute large
+uv run datasheet-wiki build rp2040.pdf --compute large
 # For a 600-page datasheet with thousands of sections, a cheaper model saves a lot:
-datasheet-wiki build rp2040.pdf --compute large --model claude-haiku-4-5
+uv run datasheet-wiki build rp2040.pdf --compute large --model claude-haiku-4-5
 ```
 
 ---
@@ -157,8 +163,8 @@ public repo** (the included `.gitignore` blocks them by default).
 ## Development
 
 ```bash
-pip install -e ".[dev]"
-pytest
+uv sync --extra dev
+uv run pytest
 ```
 
 ## License
