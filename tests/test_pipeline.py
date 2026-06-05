@@ -1,22 +1,10 @@
-"""End-to-end test of the small (no-LLM) tier on a synthetic datasheet."""
+"""End-to-end test of the small (no-LLM) tier on a synthetic datasheet.
+
+The `wiki` fixture (a built small-tier wiki) lives in tests/conftest.py.
+"""
 from __future__ import annotations
 
 from pathlib import Path
-
-import pytest
-
-from datasheet_wiki.config import Config
-from datasheet_wiki.pipeline import run
-from tests.make_sample_pdf import make_sample
-
-
-@pytest.fixture
-def wiki(tmp_path: Path):
-    pdf = make_sample(tmp_path / "sample.pdf")
-    out = tmp_path / "wiki"
-    cfg = Config.from_tier(pdf, out, "small", progress=False)
-    run(cfg)
-    return out
 
 
 def test_core_pages_exist(wiki: Path):
