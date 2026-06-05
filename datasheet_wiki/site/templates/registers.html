@@ -8,6 +8,15 @@
     across {{ reg_groups|length }} section{{ '' if reg_groups|length == 1 else 's' }}.
     Each has an interactive bit-field calculator.</p>
 
+  {% if c_header %}
+  <div class="export">
+    <a class="btn btn-ghost" href="device.h" download>⤓ device.h</a>
+    {% if has_svd %}<a class="btn btn-ghost" href="device.svd" download>⤓ CMSIS-SVD</a>{% endif %}
+    <details class="codefold"><summary><span class="cf-label">Preview</span> <code>device.h</code></summary><pre><code>{{ c_header }}</code></pre></details>
+    <p class="muted small">Heuristic export — verify addresses, widths and bit positions against the datasheet.</p>
+  </div>
+  {% endif %}
+
   <ul class="toc">
     {% for g in reg_groups %}
     <li><a href="#{{ g.id }}">{% if g.number %}<span class="secnum">{{ g.number }}</span> {% endif %}{{ g.title }}</a>

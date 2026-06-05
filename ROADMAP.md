@@ -23,7 +23,7 @@ Status legend: ✅ done · 🚧 in progress · ⬜ planned
   datasheet (name, address, fields) linked to its section — like the code index.
 - ✅ **Interactive bit-field calculator**: on each register table, enter field
   values → live hex/binary register value, and decode a pasted hex value back.
-- ⬜ **Export to C header / CMSIS-SVD** from detected registers.
+- ✅ **Export to C header / CMSIS-SVD** from detected registers.
 - ⬜ **Import an existing SVD** for authoritative register data.
 
 ## Search & navigation

@@ -134,18 +134,28 @@ class SiteBuilder:
                 code_groups=code_groups, code_count=total_code, **common,
             ),
         )
-        # register map index
+        # register map index + generated C header / SVD
         reg_groups = []
         for sec in sections:
             regs = (enrichments.get(sec.id) or Enrichment()).registers
             if regs:
                 reg_groups.append({"id": sec.id, "title": sec.short_title, "number": sec.number,
                                    "url": sec.url, "registers": regs})
+        from ..codegen import build_c_header, build_svd
+
+        device = (self.meta.get("title") or "device").split()[0]
+        c_header = build_c_header(reg_groups, device, self.meta.get("source_name", "")) if reg_groups else ""
+        svd = build_svd(reg_groups, device, self.meta.get("source_name", "")) if reg_groups else None
+        if c_header:
+            self._write("device.h", c_header)
+        if svd:
+            self._write("device.svd", svd)
         self._write(
             "registers.html",
             self.env.get_template("registers.html").render(
                 root="", page="registers", current_url="",
-                reg_groups=reg_groups, register_count=total_regs, **common,
+                reg_groups=reg_groups, register_count=total_regs,
+                c_header=c_header, has_svd=bool(svd), **common,
             ),
         )
 
