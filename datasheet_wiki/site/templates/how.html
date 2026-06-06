@@ -61,17 +61,26 @@
     </tr>
     <tr>
       <th>Formatted text</th>
-      <td>The raw PDF text reflowed into real paragraphs (hard line breaks joined,
-        words de-hyphenated), with headings, <strong>bold</strong> and bullet
-        lists recovered from the font metadata.
-        <span class="how-tier">always local · no LLM</span></td>
+      <td>{% if meta.llm_format %}Each page is reflowed into clean HTML by the
+        <code>{{ meta.backend }}</code> model — hard line breaks joined, headings
+        and lists recovered, and (crucially) figures and tables replaced by their
+        cropped images instead of leaving scrambled OCR text in the prose. Falls
+        back to the heuristic reflow on any page the model can't format.{% else %}The
+        raw PDF text reflowed into real paragraphs (hard line breaks joined, words
+        de-hyphenated), with headings, <strong>bold</strong> and bullet lists
+        recovered from the font metadata.{% endif %}
+        <span class="how-tier">{{ ('local LLM' if meta.backend == 'ollama' else 'cloud LLM') if meta.llm_format else 'always local · no LLM' }}</span></td>
     </tr>
     <tr>
       <th>Tables</th>
-      <td>Scattered table cells (e.g. a register's <code>Bit / 7 / 6 / 5 / 4</code>
-        column) are combined onto one line and tucked into a collapsed code block;
-        a page that is entirely a table is flagged with a link to its image.
-        <span class="how-tier">always local · no LLM</span></td>
+      <td>{% if meta.llm_format %}A detected table is cropped from the page and
+        embedded as an image in the formatted text, so you read the real table
+        instead of its jumbled cell text (the raw text is still kept in a collapsed
+        block). {% endif %}Scattered table cells (e.g. a register's
+        <code>Bit / 7 / 6 / 5 / 4</code> column) are otherwise combined onto one
+        line and tucked into a collapsed code block; a page that is entirely a
+        table is flagged with a link to its image.
+        <span class="how-tier">{{ 'heuristics + LLM' if meta.llm_format else 'always local · no LLM' }}</span></td>
     </tr>
     <tr>
       <th>Figures</th>

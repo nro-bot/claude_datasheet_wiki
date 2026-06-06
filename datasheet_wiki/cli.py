@@ -30,6 +30,7 @@ def _build(args: argparse.Namespace) -> int:
         "progress": False if args.quiet else None,
         "embed_model": args.embed_model,
         "svd_path": Path(args.svd) if args.svd else None,
+        "llm_format": True if args.llm_format else (False if args.no_llm_format else None),
     }
     cfg = Config.from_tier(pdf, out, args.compute, **overrides)
 
@@ -125,6 +126,11 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--dpi", type=int, help="Page render DPI (override tier default).")
     b.add_argument("--svd", help="CMSIS-SVD file: authoritative registers for the register map and device.h export.")
     b.add_argument("--semantic", action="store_true", help="Build a local embedding index (sentence-transformers; for the planned Q&A).")
+    fmt = b.add_mutually_exclusive_group()
+    fmt.add_argument("--llm-format", action="store_true",
+                     help="Use the LLM to reflow each page into clean HTML with figures/tables as images (needs an LLM backend; on by default for medium/large).")
+    fmt.add_argument("--no-llm-format", action="store_true",
+                     help="Disable LLM page formatting even on the medium/large tier.")
     b.add_argument("--embed-model", help="sentence-transformers model for the embedding index.")
     b.add_argument("--no-images", action="store_true", help="Skip rendering page images (faster, smaller).")
     b.add_argument("--max-pages", type=int, default=0, help="Only process the first N pages (quick test).")

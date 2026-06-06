@@ -21,8 +21,8 @@ from typing import Optional
 from ..utils import log
 from .base import Backend, Enrichment
 from .heuristic import baseline
-from .prompts import SYSTEM, build_user_prompt
-from .parse import merge_llm_json
+from .prompts import FORMAT_SYSTEM, SYSTEM, build_format_prompt, build_user_prompt
+from .parse import merge_llm_json, strip_code_fences
 
 DEFAULT_MODEL = "llama3.1"
 
@@ -44,15 +44,16 @@ class OllamaBackend(Backend):
         except Exception:
             return False
 
-    def _generate(self, prompt: str) -> str:
+    def _generate(self, prompt: str, system: str = SYSTEM, as_json: bool = True) -> str:
         payload = {
             "model": self.model,
-            "system": SYSTEM,
+            "system": system,
             "prompt": prompt,
             "stream": False,
-            "format": "json",
             "options": {"temperature": 0.1},
         }
+        if as_json:
+            payload["format"] = "json"  # constrain enrichment to a JSON object
         data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
             f"{self.host}/api/generate", data=data, headers={"Content-Type": "application/json"}
@@ -75,3 +76,19 @@ class OllamaBackend(Backend):
                 self._warned = True
             return base
         return merge_llm_json(raw, base, backend=self.name)
+
+    def supports_formatting(self) -> bool:
+        return True
+
+    def format_html(self, page_text: str) -> Optional[str]:
+        if not page_text.strip():
+            return ""
+        try:
+            # free-form HTML out (not JSON-constrained)
+            raw = self._generate(build_format_prompt(page_text), system=FORMAT_SYSTEM, as_json=False)
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            if not self._warned:
+                log(f"Ollama unreachable ({exc}); falling back to heuristic page formatting.")
+                self._warned = True
+            return None
+        return strip_code_fences(raw)

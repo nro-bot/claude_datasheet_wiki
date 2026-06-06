@@ -29,6 +29,7 @@ class TierPreset:
     backend: str
     dpi: int
     semantic: bool
+    llm_format: bool
     description: str
 
 
@@ -37,6 +38,7 @@ TIER_PRESETS = {
         backend="none",
         dpi=120,
         semantic=False,
+        llm_format=False,
         description="No LLM. Heuristic cross-links, register/code detection, "
         "full-text search. Minutes, runs on any laptop.",
     ),
@@ -44,15 +46,18 @@ TIER_PRESETS = {
         backend="ollama",
         dpi=150,
         semantic=True,
+        llm_format=True,
         description="Local LLM via Ollama + local embeddings. Per-section "
-        "summaries and a local embedding index. Nothing leaves your machine.",
+        "summaries, LLM-formatted pages, and a local embedding index. Nothing "
+        "leaves your machine.",
     ),
     "large": TierPreset(
         backend="anthropic",
         dpi=200,
         semantic=True,
-        description="Cloud LLM API. Best summaries, structured register "
-        "extraction, generated code examples, embedding index.",
+        llm_format=True,
+        description="Cloud LLM API. Best summaries, LLM-formatted pages, "
+        "structured register extraction, generated code examples, embedding index.",
     ),
 }
 
@@ -76,6 +81,10 @@ class Config:
     semantic: bool = False
     embed_model: str = "all-MiniLM-L6-v2"  # local sentence-transformers model
     chunk_chars: int = 1200  # target size of a search/embedding chunk
+
+    # LLM-formatted page view: reflow each page's text into clean HTML, with
+    # figures/tables embedded as images. Needs an LLM backend (medium/large).
+    llm_format: bool = False
 
     # Authoritative register data (CMSIS-SVD); overrides PDF heuristics for the
     # register map + C-header export when supplied.
@@ -108,6 +117,7 @@ class Config:
             backend=preset.backend,
             dpi=preset.dpi,
             semantic=preset.semantic,
+            llm_format=preset.llm_format,
         )
         for key, value in overrides.items():
             if value is None:

@@ -81,6 +81,19 @@ class Backend:
     def enrich(self, title: str, text: str) -> Enrichment:  # pragma: no cover
         raise NotImplementedError
 
+    # Optional: LLM backends that can reflow a page's raw text into clean HTML
+    # (the "LLM-formatted" page view) override these two.
+    def supports_formatting(self) -> bool:
+        return False
+
+    def format_html(self, page_text: str) -> Optional[str]:  # pragma: no cover
+        """Return clean HTML for one page's text, or ``None`` on failure.
+
+        Implementations must preserve the ``[[DSWASSET_n]]`` markers verbatim.
+        Returning ``None`` lets the caller fall back to a heuristic assembly.
+        """
+        return None
+
     # Optional: backends that can embed text for semantic search override this.
     def supports_embeddings(self) -> bool:
         return False

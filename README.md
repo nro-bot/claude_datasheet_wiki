@@ -14,6 +14,14 @@ monospace block that shows one line and expands on click**, so it never clutters
 the prose. The verbatim extracted text is kept too, in a collapsed "Raw
 extracted text" panel.
 
+On the **medium and large (LLM) tiers**, that Formatted text view is produced by
+the LLM itself: each page is reflowed into clean HTML, and every detected
+**figure and table is embedded as its cropped image** instead of leaving a trail
+of scrambled OCR text in the prose (the raw text is still kept, tucked into a
+collapsed block). It's resumable and cached per page, falls back to the heuristic
+reflow on any page the model can't handle, and is sanitised to a safe tag
+allowlist. Toggle it with `--llm-format` / `--no-llm-format`.
+
 Built for everything from the 30-page ATtiny85 datasheet to the 600-page RP2040
 datasheet. Parsing can take minutes to hours depending on the tier you pick;
 that's fine — you only do it once per datasheet.
@@ -74,8 +82,8 @@ All of these run entirely client-side and work offline.
 | Tier | Backend | What you get | Needs |
 |------|---------|--------------|-------|
 | **small** | none (heuristics) | Page images, full-text search, auto cross-reference links, register/bit-field detection, code-block detection. **No LLM, runs on any laptop in minutes.** | nothing extra |
-| **medium** | **local LLM via [Ollama](https://ollama.com)** | Everything in small **+** per-section plain-English summaries, structured register extraction, generated code examples, **+ a local embedding index** (for the planned Q&A). **Nothing leaves your machine.** | `ollama` + `uv sync --extra local` |
-| **large** | **Claude API** | Highest-quality summaries, register extraction, and code examples. | `uv sync --extra api` + `ANTHROPIC_API_KEY` |
+| **medium** | **local LLM via [Ollama](https://ollama.com)** | Everything in small **+** per-section plain-English summaries, **LLM-formatted pages** (clean HTML with figures/tables as images), structured register extraction, generated code examples, **+ a local embedding index** (for the planned Q&A). **Nothing leaves your machine.** | `ollama` + `uv sync --extra local` |
+| **large** | **Claude API** | Highest-quality summaries, LLM-formatted pages, register extraction, and code examples. | `uv sync --extra api` + `ANTHROPIC_API_KEY` |
 
 The cross-reference linking, register/code detection, page images, and full-text
 search are **always** available — even in the no-LLM `small` tier — because they
@@ -158,6 +166,7 @@ Useful `build` options:
 | `--model NAME` | LLM model id (Ollama or Claude). |
 | `--dpi N` | Page-image resolution (tier default 120/150/200). |
 | `--svd FILE` | Use a CMSIS-SVD file as the authoritative register source (register map + `device.h`). |
+| `--llm-format` / `--no-llm-format` | Turn the LLM-formatted page view on/off (on by default for medium/large). |
 | `--semantic` | Build a local embedding index (needs `[local]` extra; for the planned Q&A). |
 | `--no-images` | Skip page images (smaller, faster). |
 | `--max-pages N` | Only process the first N pages — great for a quick test on a 600-page PDF. |
@@ -172,6 +181,7 @@ PDF ─┬─ render every page → images/            (PyMuPDF)
      ├─ extract text + table of contents + embedded hyperlinks
      ├─ build a section tree from the outline
      ├─ enrich each section  ──►  none | ollama | anthropic   (cached to disk)
+     ├─ (LLM tiers) reflow each page → clean HTML, figures/tables as images
      ├─ build full-text search index (+ optional local embeddings)
      └─ render a static site (Jinja2)  →  index.html, sections/, search.html
 ```

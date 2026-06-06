@@ -10,6 +10,7 @@ import html
 import re
 from typing import Dict, List
 
+from ..enrich.format import TOKEN_RE, FormattedPage
 from ..pdf.blocks import BOLD_END, BOLD_START, Block
 from ..pdf.structure import Section
 
@@ -42,10 +43,7 @@ def _link(target_id: str, label: str, root: str = "") -> str:
     return f'<a class="xref" href="{root}sections/{html.escape(target_id)}.html">{label}</a>'
 
 
-def linkify(text: str, number_index: Dict[str, str], page_index: Dict[int, str], root: str = "") -> str:
-    """Escape text, then turn datasheet cross references into links."""
-    escaped = html.escape(text)
-
+def _ref_subbers(number_index: Dict[str, str], page_index: Dict[int, str], root: str):
     def sec_sub(m: re.Match) -> str:
         num = m.group(1)
         tgt = number_index.get(num)
@@ -65,9 +63,28 @@ def linkify(text: str, number_index: Dict[str, str], page_index: Dict[int, str],
         tgt = page_index.get(page0)
         return _link(tgt, m.group(0), root) if tgt else m.group(0)
 
+    return sec_sub, page_sub
+
+
+def linkify(text: str, number_index: Dict[str, str], page_index: Dict[int, str], root: str = "") -> str:
+    """Escape text, then turn datasheet cross references into links."""
+    escaped = html.escape(text)
+    sec_sub, page_sub = _ref_subbers(number_index, page_index, root)
     escaped = _REF_SECTION.sub(sec_sub, escaped)
     escaped = _REF_PAGE.sub(page_sub, escaped)
     return escaped
+
+
+def linkify_html(html_str: str, number_index: Dict[str, str], page_index: Dict[int, str], root: str = "") -> str:
+    """Cross-reference-link text that is *already* safe HTML (do not re-escape).
+
+    The reference patterns ("Section 4.3", "page 42") contain no HTML-special
+    characters and our LLM HTML is sanitised to attribute-free tags, so applying
+    them directly to the markup cannot corrupt a tag."""
+    sec_sub, page_sub = _ref_subbers(number_index, page_index, root)
+    html_str = _REF_SECTION.sub(sec_sub, html_str)
+    html_str = _REF_PAGE.sub(page_sub, html_str)
+    return html_str
 
 
 _HEADING_TAG = {2: "h4", 3: "h5", 4: "h6"}
@@ -136,6 +153,48 @@ def render_blocks(
             if txt.strip():
                 out.append(f"<p>{txt}</p>")
     return "\n".join(out)
+
+
+# --- LLM-formatted page view ----------------------------------------------
+# (format.py imports site.sanitize but not site.render, so there is no cycle.)
+_P_WRAPPED_TOKEN = re.compile(r"<p>\s*(" + TOKEN_RE.pattern + r")\s*</p>")
+
+
+def _asset_html(asset, root: str) -> str:
+    """An embedded figure/table image, with its OCR text tucked into a codefold."""
+    label = "Figure" if asset.kind == "figure" else "Table"
+    cap = f"{label} — page {asset.page + 1}"
+    img = (f'<img loading="lazy" src="{root}{html.escape(asset.image_rel)}" '
+           f'alt="{label} on page {asset.page + 1}">')
+    fig = (f'<figure class="dsfig dsasset dsasset-{asset.kind}">'
+           f'<a href="{root}{html.escape(asset.image_rel)}" target="_blank" rel="noopener">{img}</a>'
+           f'<figcaption>{cap}</figcaption></figure>')
+    if (asset.text or "").strip():
+        fig += _codefold(asset.text, None, "table" if asset.kind == "table" else "fig")
+    return fig
+
+
+def render_formatted_page(
+    fp: "FormattedPage", number_index: Dict[str, str], page_index: Dict[int, str],
+    root: str = "", show_page_label: bool = False,
+) -> str:
+    """Substitute a page's asset markers with embedded images and cross-link it."""
+    assets = fp.assets
+
+    def swap(i: int) -> str:
+        return _asset_html(assets[i], root) if 0 <= i < len(assets) else ""
+
+    out = fp.html
+    # Promote `<p>[[marker]]</p>` to a block-level swap so a <figure> never nests
+    # inside a <p> (which the HTML parser would auto-close, breaking layout). In
+    # this pattern group 1 is the whole marker and group 2 its numeric index.
+    out = _P_WRAPPED_TOKEN.sub(lambda m: swap(int(m.group(2))), out)
+    out = TOKEN_RE.sub(lambda m: swap(int(m.group(1))), out)
+    out = linkify_html(out, number_index, page_index, root)
+    if show_page_label:
+        out = (f'<p class="fmt-page" id="fmt-p{fp.page + 1}">'
+               f'<span class="fmt-page-n">Page {fp.page + 1}</span></p>') + out
+    return out
 
 
 def render_body(

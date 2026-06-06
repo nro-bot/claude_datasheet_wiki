@@ -37,5 +37,11 @@ Status legend: ✅ done · 🚧 in progress · ⬜ planned
 - ⬜ **Electrical-characteristics tables** as sortable/filterable HTML.
 - ✅ **PWA offline export (service worker + manifest); single-file export** + print stylesheet.
 
+## Readability
+- ✅ **LLM-formatted pages** (medium/large tiers): each page reflowed into clean
+  HTML by the LLM, with figures and detected tables embedded as their cropped
+  images instead of leaking scrambled OCR text into the prose. Cached per page,
+  sanitised to a tag allowlist, with a heuristic fallback per page.
+
 ## Trust
 - ✅ **Provenance + confidence badges** (heuristic vs LLM) on every datum.

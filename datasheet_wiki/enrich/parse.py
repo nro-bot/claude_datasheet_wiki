@@ -7,10 +7,23 @@ deterministic heuristic baseline rather than failing the whole build.
 from __future__ import annotations
 
 import json
+import re
 from typing import Optional
 
 from ..utils import log
 from .base import CodeExample, Enrichment, Register, RegisterField
+
+_FENCE_RE = re.compile(r"^\s*```[a-zA-Z0-9]*\s*\n?|\n?\s*```\s*$")
+
+
+def strip_code_fences(raw: str) -> str:
+    """Drop a leading/trailing ```html ... ``` fence some models wrap output in."""
+    if not raw:
+        return ""
+    text = raw.strip()
+    if "```" in text:
+        text = _FENCE_RE.sub("", text).strip()
+    return text
 
 
 def _extract_json_object(raw: str) -> Optional[str]:

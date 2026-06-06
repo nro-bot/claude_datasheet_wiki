@@ -20,8 +20,8 @@ from typing import Optional
 from ..utils import log
 from .base import Backend, Enrichment
 from .heuristic import baseline
-from .parse import merge_llm_json
-from .prompts import SYSTEM, build_user_prompt
+from .parse import merge_llm_json, strip_code_fences
+from .prompts import FORMAT_SYSTEM, SYSTEM, build_format_prompt, build_user_prompt
 
 DEFAULT_MODEL = "claude-opus-4-8"
 
@@ -140,3 +140,28 @@ class AnthropicBackend(Backend):
                 self._warned = True
             return base
         return merge_llm_json(raw, base, backend=self.name)
+
+    def supports_formatting(self) -> bool:
+        return True
+
+    def format_html(self, page_text: str) -> Optional[str]:
+        if not page_text.strip():
+            return ""
+        try:
+            client = self._get_client()
+            resp = client.messages.create(
+                model=self.model,
+                max_tokens=self.max_tokens,
+                thinking={"type": "disabled"},
+                system=[
+                    {"type": "text", "text": FORMAT_SYSTEM, "cache_control": {"type": "ephemeral"}}
+                ],
+                messages=[{"role": "user", "content": build_format_prompt(page_text)}],
+            )
+            raw = next((b.text for b in resp.content if b.type == "text"), "")
+        except Exception as exc:  # pragma: no cover - network/credentials
+            if not self._warned:
+                log(f"Anthropic API error ({exc}); falling back to heuristic page formatting.")
+                self._warned = True
+            return None
+        return strip_code_fences(raw)

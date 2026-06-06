@@ -59,6 +59,26 @@ def run(cfg: Config) -> Path:
         cfg.out_dir / "figures", limit=limit, extract_figures=True, resume=cfg.resume
     )
 
+    # 2c. decide on LLM page formatting and (while the PDF is still open) extract
+    # the per-page items, cropping every figure/table to an image.
+    backend = get_backend(cfg.backend, model=cfg.model, ollama_host=cfg.ollama_host)
+    backend_avail = backend.available() if cfg.backend != "none" else False
+    do_format = bool(
+        cfg.llm_format and cfg.backend != "none"
+        and backend.supports_formatting() and backend_avail
+    )
+    if cfg.llm_format and not do_format:
+        if cfg.backend == "none":
+            log("NOTE: --llm-format needs an LLM backend (use --compute medium/large "
+                "or --backend); skipping page formatting.")
+        elif not backend_avail:
+            log(f"WARNING: --llm-format requested but backend '{cfg.backend}' is "
+                "unavailable; skipping LLM page formatting.")
+    page_items = (
+        doc.layout_page_items(cfg.out_dir / "figures", limit=limit, resume=cfg.resume)
+        if do_format else None
+    )
+
     # 3. structure
     outline = doc.outline()
     log(f"Outline entries: {len(outline)}")
@@ -73,9 +93,8 @@ def run(cfg: Config) -> Path:
                 blk.image_rel = f"images/{images[blk.page]}"
 
     # 4. enrichment (cached)
-    backend = get_backend(cfg.backend, model=cfg.model, ollama_host=cfg.ollama_host)
     if cfg.backend != "none":
-        if backend.available():
+        if backend_avail:
             log(f"Enrichment backend '{cfg.backend}' is available.")
         else:
             log(f"WARNING: backend '{cfg.backend}' is NOT available; using heuristics where it fails.")
@@ -94,6 +113,36 @@ def run(cfg: Config) -> Path:
             write_json(cpath, enr.to_dict())
         prog.update()
     prog.close()
+
+    # 4b. LLM-formatted pages (reflowed HTML; figures/tables as images). Cached
+    # per page so an interrupted run resumes without re-calling the model.
+    formats: Dict[int, "FormattedPage"] = {}
+    if do_format and page_items is not None:
+        from .enrich.format import FormattedPage, PageFormatter
+
+        fmt_cache = ensure_dir(cfg.cache_dir / "format")
+        pf = PageFormatter(backend)
+        prog = Progress(len(page_items), "llm format", enabled=cfg.progress)
+        for p, items in enumerate(page_items):
+            if not items:
+                prog.update()
+                continue
+            src = pf.source_text(items)
+            raw = ""
+            if src.strip():
+                key = sha1_text(f"{cfg.backend}|{cfg.model or ''}|fmt|{src}")
+                cpath = fmt_cache / f"{key}.json"
+                cached = read_json(cpath) if cfg.resume else None
+                if cached is not None:
+                    raw = cached.get("html", "")
+                else:
+                    raw = backend.format_html(src) or ""
+                    write_json(cpath, {"html": raw})
+            formats[p] = pf.format(p, items, raw)
+            prog.update()
+        prog.close()
+        n_llm = sum(1 for f in formats.values() if f.backend != "none")
+        log(f"LLM-formatted {n_llm}/{len(formats)} pages.")
 
     # 5. search index
     log("Building search index...")
@@ -171,11 +220,12 @@ def run(cfg: Config) -> Path:
         "model": cfg.model,
         "dpi": cfg.dpi,
         "semantic": semantic_ok,
+        "llm_format": do_format,
         "svd_name": cfg.svd_path.name if cfg.svd_path else None,
     }
     SiteBuilder(cfg.out_dir, meta).build(
         sections, enrichments, pages_manifest=pages_manifest,
-        svd_reg_groups=svd_reg_groups, progress=cfg.progress,
+        svd_reg_groups=svd_reg_groups, formats=formats, progress=cfg.progress,
     )
 
     dt = time.time() - t0

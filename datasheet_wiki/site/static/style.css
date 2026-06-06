@@ -132,6 +132,15 @@ a.xref { border-bottom: 1px dotted var(--accent); }
 figure.dsfig { margin: 16px 0; background: #fff; border: 1px solid var(--border);
   border-radius: 8px; padding: 8px; text-align: center; }
 figure.dsfig img { max-width: 100%; max-height: 520px; display: inline-block; }
+figure.dsfig a { display: inline-block; background: transparent; }
+figure.dsfig figcaption { margin-top: 6px; font-size: 12px; color: var(--muted); text-align: center; }
+/* embedded figures/tables in the LLM-formatted view: a real image in place of
+   the scrambled OCR text the table/figure would otherwise leave in the prose. */
+figure.dsasset { background: #fff; }
+figure.dsasset-table img { max-height: 640px; }
+.fmt-page { margin: 26px 0 4px; border-top: 1px dashed var(--border); padding-top: 12px; }
+.fmt-page-n { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.llm-formatted > h2 { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px; }
 p.tablenote { background: var(--panel); border: 1px dashed var(--border); border-radius: 8px;
   padding: 10px 14px; color: var(--muted); font-style: italic; }
 
@@ -181,15 +190,17 @@ details.rawtext .bodytext p { color: var(--muted); }
 .prevnext-top span { opacity: .3; }
 .prevnext-top a:hover { background: var(--panel2); text-decoration: none; color: var(--accent); }
 
-/* source page floats left, formatted text flows beside it (side-by-side);
-   everything after clears to full width below. */
-@media (min-width: 821px) {
-  .prose.section .pageimages { float: left; width: 40%; margin: 0 26px 18px 0; }
-  .prose.section .pageimages h2 { margin-top: 0; }
-  .prose.section .pageimages .thumbs { grid-template-columns: 1fr; }
-  .prose.section .formatted h2 { margin-top: 0; }
-  .prose.section .registers, .prose.section .code-examples,
-  .prose.section .rawtext, .prose.section .notes, .prose.section .prevnext { clear: both; }
+/* Source page image and the formatted text sit side-by-side as two columns
+   (a flex split), so you read the cleaned-up text next to the original page.
+   Side-by-side is the default; narrow screens stack it. */
+.section-split { display: flex; align-items: flex-start; gap: 26px; }
+.section-split .pageimages { flex: 0 0 40%; min-width: 0; margin: 0; }
+.section-split .pageimages .thumbs { grid-template-columns: 1fr; }
+.section-split .split-text { flex: 1 1 0; min-width: 0; }
+.section-split .pageimages h2, .section-split .split-text .formatted h2 { margin-top: 0; }
+@media (max-width: 759px) {
+  .section-split { display: block; }
+  .section-split .pageimages { margin-bottom: 18px; }
 }
 .pagefoot { margin-top: 50px; padding-top: 16px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
 

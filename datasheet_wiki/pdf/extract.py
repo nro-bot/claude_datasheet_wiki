@@ -166,6 +166,26 @@ class PdfDocument:
         prog.close()
         return out
 
+    def layout_page_items(self, figures_dir, limit: int = 0, fig_dpi: int = 130, resume: bool = True):
+        """Per-page items for the LLM-formatted view: prose text plus every
+        figure/table cropped to an image (see datasheet_wiki/pdf/page_items.py)."""
+        from .page_items import extract_page_items
+
+        n = self.page_count if not limit else min(limit, self.page_count)
+        out = []
+        prog = Progress(n, "page items")
+        for i in range(n):
+            try:
+                items = extract_page_items(
+                    self.doc[i], i, figures_dir=figures_dir, fig_dpi=fig_dpi, resume=resume
+                )
+            except Exception:
+                items = []
+            out.append(items)
+            prog.update()
+        prog.close()
+        return out
+
     def close(self) -> None:
         self.doc.close()
 

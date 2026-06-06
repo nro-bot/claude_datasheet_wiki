@@ -13,7 +13,13 @@ from ..enrich.base import Enrichment
 from ..glossary import annotate as gloss_annotate, present_terms
 from ..pdf.structure import Section
 from ..utils import Progress, ensure_dir, slugify
-from .render import build_number_index, build_page_index, render_blocks, render_body
+from .render import (
+    build_number_index,
+    build_page_index,
+    render_blocks,
+    render_body,
+    render_formatted_page,
+)
 
 TEMPLATES = Path(__file__).parent / "templates"
 STATIC = Path(__file__).parent / "static"
@@ -64,6 +70,7 @@ class SiteBuilder:
         enrichments: Dict[str, Enrichment],
         pages_manifest: Optional[List[dict]] = None,
         svd_reg_groups: Optional[List[dict]] = None,
+        formats: Optional[Dict[int, object]] = None,
         progress: bool = True,
     ) -> None:
         by_id = {s.id: s for s in sections}
@@ -218,6 +225,17 @@ class SiteBuilder:
         for i, sec in enumerate(sections):
             enr = enrichments.get(sec.id) or Enrichment()
             formatted = render_blocks(sec.blocks, number_index, page_index, root="../")
+            # LLM-formatted view (when available): reflowed HTML per page in this
+            # section, with figures/tables embedded as images.
+            sec_pages = [formats[p] for p in range(sec.start_page, sec.end_page + 1)
+                         if formats and p in formats] if formats else []
+            multi = len(sec_pages) > 1
+            llm_formatted = "\n".join(
+                render_formatted_page(fp, number_index, page_index, root="../", show_page_label=multi)
+                for fp in sec_pages
+            )
+            format_backend = next((fp.backend for fp in sec_pages if fp.backend != "none"),
+                                  ("none" if sec_pages else ""))
             body = render_body(sec.text, number_index, page_index, root="../")
             prev_s = sections[i - 1] if i > 0 else None
             next_s = sections[i + 1] if i < len(sections) - 1 else None
@@ -229,6 +247,8 @@ class SiteBuilder:
                 breadcrumbs=self._breadcrumbs(sec, by_id),
                 body=body,
                 formatted=formatted,
+                llm_formatted=llm_formatted,
+                format_backend=format_backend,
                 summary_html=gloss_annotate(enr.summary) if enr.summary else "",
                 enrichment=enr,
                 images=sec.page_images,
