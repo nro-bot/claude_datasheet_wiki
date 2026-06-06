@@ -118,37 +118,29 @@ def run(cfg: Config) -> Path:
     # per page so an interrupted run resumes without re-calling the model.
     formats: Dict[int, "FormattedPage"] = {}
     if do_format and page_items is not None:
-        from .enrich.format import FormattedPage, PageFormatter
+        from .enrich.format import PageFormatter
         from .utils import parse_page_spec
 
-        # Optional preview: only call the LLM for a subset of pages. Sections that
-        # contain a selected page still get a complete formatted view (their other
-        # pages use the heuristic fallback); untouched sections keep the heuristic
-        # reflow, so a preview stays cheap without dropping any content.
-        selected = None
+        # Optional preview: only LLM-format the requested pages so you can see the
+        # result without processing the whole datasheet. A section renders the
+        # formatted view for whichever of its pages were formatted, and sections
+        # with none keep the heuristic reflow — so a preview stays cheap.
         if cfg.llm_format_pages:
             selected = parse_page_spec(cfg.llm_format_pages, len(page_items))
-            cover = set()
-            for sec in sections:
-                rng = set(range(sec.start_page, min(sec.end_page, len(page_items) - 1) + 1))
-                if rng & selected:
-                    cover |= rng
-            log(f"LLM page-format preview: {len(selected)} page(s) "
-                f"({sorted(p + 1 for p in selected)}), {len(cover)} with their sections.")
+            todo = [p for p in sorted(selected) if page_items[p]]
+            log(f"LLM page-format preview: {len(todo)} page(s) "
+                f"({[p + 1 for p in todo]}).")
         else:
-            cover = set(range(len(page_items)))
+            todo = [p for p, items in enumerate(page_items) if items]
 
         fmt_cache = ensure_dir(cfg.cache_dir / "format")
         pf = PageFormatter(backend)
-        prog = Progress(len(page_items), "llm format", enabled=cfg.progress)
-        for p, items in enumerate(page_items):
-            if not items or p not in cover:
-                prog.update()
-                continue
-            use_llm = selected is None or p in selected
+        prog = Progress(len(todo), "llm format", enabled=cfg.progress)
+        for p in todo:
+            items = page_items[p]
             src = pf.source_text(items)
             raw = ""
-            if use_llm and src.strip():
+            if src.strip():
                 key = sha1_text(f"{cfg.backend}|{cfg.model or ''}|fmt|{src}")
                 cpath = fmt_cache / f"{key}.json"
                 cached = read_json(cpath) if cfg.resume else None
