@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import shutil
+import uuid
 from datetime import date
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -103,9 +104,13 @@ class SiteBuilder:
             "name": title, "short_name": title[:24], "start_url": "./index.html",
             "display": "standalone", "background_color": "#0f1115", "theme_color": "#0f1115",
         }, ensure_ascii=False, indent=2), encoding="utf-8")
-        (self.out / "sw.js").write_text((STATIC / "sw.js").read_text(encoding="utf-8"), encoding="utf-8")
+        # Stamp a per-build id into the service-worker cache name so a rebuild
+        # invalidates the previously-cached assets (otherwise the cache-first SW
+        # would keep serving a stale CSS/JS after you regenerate the wiki).
+        sw_src = (STATIC / "sw.js").read_text(encoding="utf-8")
+        build_id = f"{wiki_id}-{uuid.uuid4().hex[:12]}"
+        (self.out / "sw.js").write_text(sw_src.replace("__DSW_BUILD__", build_id), encoding="utf-8")
         (self.out / "assets" / "sw.js").unlink(missing_ok=True)  # only the root copy is used
-
         # quick-jump palette index (sections + registers + key pages)
         palette = []
         for s in sections:
