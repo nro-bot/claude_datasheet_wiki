@@ -30,7 +30,8 @@ def _build(args: argparse.Namespace) -> int:
         "progress": False if args.quiet else None,
         "embed_model": args.embed_model,
         "svd_path": Path(args.svd) if args.svd else None,
-        "llm_format": True if args.llm_format else (False if args.no_llm_format else None),
+        "llm_format": True if (args.llm_format or args.llm_format_pages) else (False if args.no_llm_format else None),
+        "llm_format_pages": args.llm_format_pages,
     }
     cfg = Config.from_tier(pdf, out, args.compute, **overrides)
 
@@ -131,6 +132,10 @@ def build_parser() -> argparse.ArgumentParser:
                      help="Use the LLM to reflow each page into clean HTML with figures/tables as images (needs an LLM backend; on by default for medium/large).")
     fmt.add_argument("--no-llm-format", action="store_true",
                      help="Disable LLM page formatting even on the medium/large tier.")
+    b.add_argument("--llm-format-pages", metavar="SPEC",
+                   help="Only LLM-format a subset of pages — a quick preview. \"3\" = "
+                        "first 3 pages; \"40-42\" or \"1,3,5\" = those pages. Implies "
+                        "--llm-format; other pages keep the heuristic formatted view.")
     b.add_argument("--embed-model", help="sentence-transformers model for the embedding index.")
     b.add_argument("--no-images", action="store_true", help="Skip rendering page images (faster, smaller).")
     b.add_argument("--max-pages", type=int, default=0, help="Only process the first N pages (quick test).")

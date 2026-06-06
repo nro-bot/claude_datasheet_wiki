@@ -127,6 +127,10 @@ uv run datasheet-wiki serve wiki/sample
 uv sync --extra local
 ollama pull llama3.1          # or qwen2.5, mistral, phi3 …
 uv run datasheet-wiki build rp2040.pdf --compute medium --model llama3.1
+
+# Previewing first? LLM-format just a few pages to see the result before
+# committing to a full multi-hour run (the rest stay on the heuristic view):
+uv run datasheet-wiki build rp2040.pdf --compute medium --llm-format-pages 40-42
 ```
 
 GPU acceleration is handled by **Ollama itself**, not this tool — it uses Metal
@@ -167,6 +171,7 @@ Useful `build` options:
 | `--dpi N` | Page-image resolution (tier default 120/150/200). |
 | `--svd FILE` | Use a CMSIS-SVD file as the authoritative register source (register map + `device.h`). |
 | `--llm-format` / `--no-llm-format` | Turn the LLM-formatted page view on/off (on by default for medium/large). |
+| `--llm-format-pages SPEC` | **Preview:** only LLM-format a few pages. `3` = first 3 pages; `40-42` or `1,3,5` = those pages. Other pages keep the heuristic view. |
 | `--semantic` | Build a local embedding index (needs `[local]` extra; for the planned Q&A). |
 | `--no-images` | Skip page images (smaller, faster). |
 | `--max-pages N` | Only process the first N pages — great for a quick test on a 600-page PDF. |

@@ -8,7 +8,37 @@ import sys
 import time
 import unicodedata
 from pathlib import Path
-from typing import Any, Iterable, Iterator
+from typing import Any, Iterable, Iterator, Set
+
+
+def parse_page_spec(spec: str, n_pages: int) -> Set[int]:
+    """Parse a page selection into a set of 0-based page indices.
+
+    A bare integer ``N`` means "the first N pages" (handy for a quick preview);
+    a comma/range list like ``40-42`` or ``1,3,5`` selects those 1-based pages.
+    Out-of-range values are ignored.
+    """
+    spec = (spec or "").strip()
+    if not spec:
+        return set()
+    if re.fullmatch(r"\d+", spec):
+        return set(range(min(int(spec), n_pages)))
+    pages: Set[int] = set()
+    for part in spec.split(","):
+        part = part.strip()
+        if not part:
+            continue
+        if "-" in part:
+            a, _, b = part.partition("-")
+            if a.strip().isdigit() and b.strip().isdigit():
+                for p in range(int(a), int(b) + 1):
+                    if 1 <= p <= n_pages:
+                        pages.add(p - 1)
+        elif part.isdigit():
+            p = int(part)
+            if 1 <= p <= n_pages:
+                pages.add(p - 1)
+    return pages
 
 
 # ---------------------------------------------------------------------------

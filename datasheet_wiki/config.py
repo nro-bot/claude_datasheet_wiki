@@ -85,6 +85,10 @@ class Config:
     # LLM-formatted page view: reflow each page's text into clean HTML, with
     # figures/tables embedded as images. Needs an LLM backend (medium/large).
     llm_format: bool = False
+    # Limit the (expensive) LLM page formatting to a subset of pages — a quick
+    # preview. "3" = first 3 pages; "40-42" / "1,3,5" = those 1-based pages.
+    # None = format every page. Other pages keep the heuristic formatted view.
+    llm_format_pages: Optional[str] = None
 
     # Authoritative register data (CMSIS-SVD); overrides PDF heuristics for the
     # register map + C-header export when supplied.

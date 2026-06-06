@@ -4,6 +4,23 @@ from __future__ import annotations
 from datasheet_wiki.enrich.format import Asset, FormattedPage, PageFormatter, asset_token
 from datasheet_wiki.pdf.page_items import PageItem
 from datasheet_wiki.site.render import render_formatted_page
+from datasheet_wiki.utils import parse_page_spec
+
+
+def test_parse_page_spec_count_means_first_n():
+    assert parse_page_spec("3", 10) == {0, 1, 2}
+    assert parse_page_spec("3", 2) == {0, 1}  # clamps to page count
+
+
+def test_parse_page_spec_ranges_and_lists_are_1_based():
+    assert parse_page_spec("40-42", 100) == {39, 40, 41}
+    assert parse_page_spec("1,3,5", 100) == {0, 2, 4}
+    assert parse_page_spec("2-3, 7", 100) == {1, 2, 6}
+
+
+def test_parse_page_spec_ignores_out_of_range_and_junk():
+    assert parse_page_spec("5-7", 3) == set()  # all beyond the page count
+    assert parse_page_spec("", 10) == set()
 
 
 class _FakeBackend:
